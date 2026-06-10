@@ -1,0 +1,18 @@
+import { Controller, Get, Param } from '@nestjs/common';
+import { CustomersService } from './customers.service';
+
+@Controller('customers')
+export class CustomersController {
+    constructor(
+        private customersService: CustomersService,
+    ) { }
+
+    @Get('branch/:branchId')
+    getCustomersByBranch(
+        @Param('branchId') branchId: string,
+    ) {
+        return this.customersService.getCustomersByBranch(
+            branchId,
+        );
+    }
+}
