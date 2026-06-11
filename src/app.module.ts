@@ -19,6 +19,7 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
+import { AlarmModule } from './alarm/alarm.module';
 
 @Module({
   imports: [
@@ -54,6 +55,7 @@ import { join } from 'path';
     CustomersModule,
     AppointmentsModule,
     FileUploadModule,
+    AlarmModule,
   ],
   controllers: [AppController],
   providers: [AppService],

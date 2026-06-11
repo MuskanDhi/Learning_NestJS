@@ -48,4 +48,31 @@ export class FileUploadService {
       imageUrl: `http://localhost:3000/uploads/${finalFilename}`,
     };
   }
+
+  async deleteFile(filename: string) {
+    const filePath = path.join('uploads', filename);
+    if (fs.existsSync(filePath)) {
+      fs.unlinkSync(filePath);
+    }
+  }
+
+  async UpdateFile(filename: string, file: Express.Multer.File) {
+    const filePath = path.join('uploads', filename);
+    if (fs.existsSync(filePath)) {
+      fs.unlinkSync(filePath);
+    }
+    return this.handleFileUpload(file);
+  }
+
+  async getAllFiles() {
+    const directoryPath = path.join('uploads');
+    if (!fs.existsSync(directoryPath)) {
+      return [];
+    }
+    const files = fs.readdirSync(directoryPath);
+    return files.map(file => ({
+      filename: file,
+      url: `http://localhost:3000/uploads/${file}`,
+    }));
+  }
 }
