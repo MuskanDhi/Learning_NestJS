@@ -45,6 +45,11 @@ export class SalonsController {
         );
     }
 
+    @Get()
+    getAllSalons() {
+        return this.salonsService.getAllSalons();
+    }
+
     @UseGuards(JwtAuthGuard)
     @Patch(':id')
     update(

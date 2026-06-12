@@ -20,6 +20,12 @@ import { AppService } from './app.service';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
 import { AlarmModule } from './alarm/alarm.module';
+import { LocationModule } from './location/location.module';
+import { ChatGateway } from './chat/chat.gateway';
+import { ChatModule } from './chat/chat.module';
+import { NotificationGateway } from './notification/notification.gateway';
+import { NotificationModule } from './notification/notification.module';
+import { RedisModule } from './redis/redis.module';
 
 @Module({
   imports: [
@@ -56,8 +62,12 @@ import { AlarmModule } from './alarm/alarm.module';
     AppointmentsModule,
     FileUploadModule,
     AlarmModule,
+    LocationModule,
+    ChatModule,
+    NotificationModule,
+    RedisModule,
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [AppService, NotificationGateway],
 })
 export class AppModule { }

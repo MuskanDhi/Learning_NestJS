@@ -6,6 +6,8 @@ import { Salon } from './entities/salon.entity';
 import { User } from 'src/users/entities/user.entity';
 import { AuthModule } from 'src/auth/auth.module';
 import { Branch } from 'src/branches/entities/branch.entity';
+import { NotificationModule } from 'src/notification/notification.module';
+import { RedisModule } from 'src/redis/redis.module';
 
 @Module({
     imports: [
@@ -15,6 +17,8 @@ import { Branch } from 'src/branches/entities/branch.entity';
       User,
     ]),
     AuthModule,
+    NotificationModule,
+    RedisModule,
   ],
   controllers: [SalonsController],
   providers: [SalonsService],

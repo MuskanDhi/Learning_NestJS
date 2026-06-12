@@ -12,10 +12,14 @@ import { Salon } from './entities/salon.entity';
 import { CreateSalonDto } from './dto/create-salon.dto';
 import { Branch } from 'src/branches/entities/branch.entity';
 import { User } from 'src/users/entities/user.entity';
+import { NotificationGateway } from 'src/notification/notification.gateway';
+import { RedisService } from 'src/redis/redis.service';
 
 @Injectable()
 export class SalonsService {
     constructor(
+        private readonly redisService: RedisService,
+
         @InjectRepository(Salon)
         private salonRepository: Repository<Salon>,
 
@@ -24,45 +28,9 @@ export class SalonsService {
 
         @InjectRepository(User)
         private userRepository: Repository<User>,
+
+        private readonly notificationGateway: NotificationGateway,
     ) { }
-
-    // async create(body, userId: string) {
-    //     const user =
-    //         await this.userRepository.findOne({
-    //             where: { id: userId },
-    //         });
-
-    //     if (!user) {
-    //         throw new NotFoundException(
-    //             'User not found',
-    //         );
-    //     }
-
-    //     const existingSalon =
-    //         await this.salonRepository.findOne({
-    //             where: {
-    //                 ownerPhoneNumber:
-    //                     body.ownerPhoneNumber,
-    //             },
-    //         });
-
-    //     if (existingSalon) {
-    //         throw new BadRequestException(
-    //             'Owner phone number already exists',
-    //         );
-    //     }
-
-    //     const salon =
-    //         this.salonRepository.create({
-    //             ...body,
-    //             user,
-    //         });
-
-    //     return await this.salonRepository.save(
-    //         salon,
-    //     );
-    // }
-
 
     async create(
         dto: CreateSalonDto,
@@ -103,6 +71,9 @@ export class SalonsService {
                     salon,
                 }),
             );
+        this.notificationGateway.sendNotification(
+            'New booking received!',
+        );
         return {
             message:
                 'Salon created successfully',
@@ -117,19 +88,32 @@ export class SalonsService {
         }
     }
 
-    // async findMySalons(userId: string) {
-    //     return await this.salonRepository.find({
-    //         where: {
-    //             user: {
-    //                 id: userId,
-    //             },
-    //         },
-    //         relations: {
-    //             user: true,
-    //             branches: true,
-    //         },
-    //     });
-    // }
+    async getAllSalons() {
+
+        const cachedSalons =
+            await this.redisService.client.get('all_salons');
+
+        if (cachedSalons) {
+            console.log('Data from Redis');
+
+            return JSON.parse(cachedSalons);
+        }
+
+        console.log('Data from Database');
+
+        const salons = await this.salonRepository.find();
+
+        await this.redisService.client.set(
+            'all_salons',
+            JSON.stringify(salons),
+            {
+                EX: 60, // cache for 60 seconds
+            },
+        );
+
+        return salons;
+    }
+
     async findMySalons(userId: string) {
 
         const user = await this.userRepository.findOne({
