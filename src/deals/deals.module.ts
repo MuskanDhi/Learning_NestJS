@@ -18,5 +18,6 @@ import { DealsService } from './deals.service';
     ],
     controllers: [DealsController],
     providers: [DealsService],
+    exports: [DealsService],
 })
 export class DealsModule {}

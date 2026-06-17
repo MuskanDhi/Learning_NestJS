@@ -12,6 +12,7 @@ import { AuthModule } from 'src/auth/auth.module';
     AuthModule,
   ],
   controllers: [BranchesController],
-  providers: [BranchesService]
+  providers: [BranchesService],
+  exports: [BranchesService],
 })
 export class BranchesModule { }

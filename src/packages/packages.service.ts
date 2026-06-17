@@ -52,6 +52,12 @@ export class PackagesService {
                 },
             });
 
+        const originalPrice = services.reduce(
+            (sum, service) =>
+                sum + Number(service.price),
+            0,
+        );
+
         if (
             services.length !==
             dto.serviceIds.length
@@ -83,7 +89,7 @@ export class PackagesService {
                         dto.packageName,
 
                     originalPrice:
-                        dto.originalPrice,
+                        originalPrice.toString(),
 
                     offeredPrice:
                         dto.offeredPrice,

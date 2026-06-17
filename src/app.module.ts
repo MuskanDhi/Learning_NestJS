@@ -26,7 +26,9 @@ import { ChatModule } from './chat/chat.module';
 import { NotificationGateway } from './notification/notification.gateway';
 import { NotificationModule } from './notification/notification.module';
 import { RedisModule } from './redis/redis.module';
-
+import { PurchasedPackagesModule } from './purchased-packages/purchased-packages.module';
+import { PurchasedDealsModule } from './purchased-deals/purchased-deals.module';
+import { PurchasedPackageServicesModule } from './purchased-package-services/purchased-package-services.module';
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -66,6 +68,9 @@ import { RedisModule } from './redis/redis.module';
     ChatModule,
     NotificationModule,
     RedisModule,
+    PurchasedPackagesModule,
+    PurchasedDealsModule,
+    PurchasedPackageServicesModule,
   ],
   controllers: [AppController],
   providers: [AppService, NotificationGateway],

@@ -50,6 +50,12 @@ export class DealsService {
                 },
             });
 
+        const originalPrice = services.reduce(
+            (sum, service) =>
+                sum + Number(service.price),
+            0,
+        );
+
         if (
             services.length !==
             dto.serviceIds.length
@@ -68,34 +74,34 @@ export class DealsService {
                         .id !== branchId,
             );
 
-        if(invalidService){
+        if (invalidService) {
             throw new BadRequestException(
                 'Selected service does not belong to this branch',
             );
         }
 
-        const deal = 
+        const deal =
             await this.dealRepo.save(
                 this.dealRepo.create({
                     dealName:
                         dto.dealName,
-                    
+
                     originalPrice:
-                        dto.originalPrice,
+                        originalPrice.toString(),
 
                     offeredPrice:
                         dto.offeredPrice,
-                    
+
                     startDate:
                         dto.startDate,
 
                     endDate:
                         dto.endDate,
-                    
+
                     branch,
 
                     services,
-                    
+
                 }),
             );
 
@@ -111,25 +117,25 @@ export class DealsService {
         };
     }
 
-    async findByBranch(branchId: string){
+    async findByBranch(branchId: string) {
 
-        const branch = 
-             await this.branchRepo.findOne({
-                where:{
+        const branch =
+            await this.branchRepo.findOne({
+                where: {
                     id: branchId,
                 },
-             });
+            });
 
-        if(!branch){
+        if (!branch) {
             throw new NotFoundException(
                 'Branch not found',
             );
         }
 
-        const deals = 
+        const deals =
             await this.dealRepo.find({
-                where:{
-                    branch:{
+                where: {
+                    branch: {
                         id: branchId,
                     },
                 },
@@ -142,7 +148,7 @@ export class DealsService {
             branch: {
                 ...branch,
                 deals: deals.map(
-                    ({ branch, ...member}) => member
+                    ({ branch, ...member }) => member
                 )
             }
         }
@@ -181,48 +187,48 @@ export class DealsService {
         }
 
         if (body.serviceIds) {
-        const services =
-            await this.serviceRepo.find({
-                where: {
-                    id: In(body.serviceIds),
-                },
-                relations: {
-                    subCategory: {
-                        category: {
-                            branch: true,
+            const services =
+                await this.serviceRepo.find({
+                    where: {
+                        id: In(body.serviceIds),
+                    },
+                    relations: {
+                        subCategory: {
+                            category: {
+                                branch: true,
+                            },
                         },
                     },
-                },
-            });
+                });
 
-        if (
-            services.length !==
-            body.serviceIds.length
-        ) {
-            throw new BadRequestException(
-                'One or more services not found',
-            );
+            if (
+                services.length !==
+                body.serviceIds.length
+            ) {
+                throw new BadRequestException(
+                    'One or more services not found',
+                );
+            }
+
+            const invalidService =
+                services.find(
+                    (service) =>
+                        service.subCategory
+                            .category
+                            .branch
+                            .id !== deal.branch.id,
+                );
+
+            if (invalidService) {
+                throw new BadRequestException(
+                    'Selected service does not belong to this branch',
+                );
+            }
+
+            deal.services = services;
         }
 
-        const invalidService =
-            services.find(
-                (service) =>
-                    service.subCategory
-                        .category
-                        .branch
-                        .id !== deal.branch.id,
-            );
-
-        if (invalidService) {
-            throw new BadRequestException(
-                'Selected service does not belong to this branch',
-            );
-        }
-
-        deal.services = services;
-    }
-
-    delete body.serviceIds;
+        delete body.serviceIds;
 
         Object.assign(deal, body);
 

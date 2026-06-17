@@ -1,11 +1,8 @@
 import { IsArray, IsNotEmpty } from 'class-validator';
-export class CreateDealDto{
+export class CreateDealDto {
 
     @IsNotEmpty()
     dealName: string;
-
-    @IsNotEmpty()
-    originalPrice: string;
 
     @IsNotEmpty()
     offeredPrice: string;
@@ -19,4 +16,4 @@ export class CreateDealDto{
     @IsArray()
     serviceIds: string[];
 }
-    
+

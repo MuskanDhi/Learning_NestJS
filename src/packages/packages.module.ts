@@ -18,5 +18,6 @@ import { AuthModule } from 'src/auth/auth.module';
     ],
     controllers: [PackagesController],
     providers: [PackagesService],
+    exports: [PackagesService],
 })
-export class PackagesModule {}
+export class PackagesModule { }
