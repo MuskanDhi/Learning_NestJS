@@ -70,4 +70,43 @@ export class AddServicesIntoCartService {
       cart,
     };
   }
+
+  async getCart(branchId: string, userId: string) {
+    const user =
+      await this.userRepo.findOne({
+        where: {
+          id: userId,
+        },
+      });
+
+    if (!user) {
+      throw new BadRequestException(
+        'User not found',
+      );
+    }
+
+    const cartItems =
+      await this.cartRepo.find({
+        where: {
+          user: {
+            id: userId,
+          },
+          branch: {
+            id: branchId,
+          },
+        },
+        relations: {
+          service: true,
+          user: true,
+          branch: true,
+        },
+      });
+
+    return {
+      success: true,
+      totalItems: cartItems.length,
+      message: 'Cart items retrieved successfully',
+      cartItems,
+    };
+  }
 }

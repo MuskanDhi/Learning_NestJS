@@ -14,11 +14,18 @@ export class AddServicesIntoCartController {
     @Body() dto: CreateAddServicesIntoCartDto,
     @Req() req,
   ) {
-    const userId = req.user.id; // Assuming the user ID is stored in the JWT payload
+    const userId = req.user.id;
     return this.addServicesIntoCartService.addServiceToCart(
     branchId,
     req.user.id,
     dto,
     );
+  }
+
+  @Get(':branchId')
+  @UseGuards(JwtAuthGuard)
+  getCart(@Param('branchId') branchId: string, @Req() req) {
+    const userId = req.user.id;
+    return this.addServicesIntoCartService.getCart(branchId, userId);
   }
 }
