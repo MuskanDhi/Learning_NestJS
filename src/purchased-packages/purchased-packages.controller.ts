@@ -20,4 +20,14 @@ export class PurchasedPackagesController {
     );
   }
   
+  // Get all purchased packages and deals for a specific branch
+  @Get(':branchId')
+  findByBranch(
+    @Param('branchId') branchId: string,
+  ) {
+    return this.purchasedPackagesService.findByBranch(
+      branchId,
+    );
+  }
+
 }

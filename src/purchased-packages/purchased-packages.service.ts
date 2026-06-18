@@ -5,6 +5,7 @@ import { Package } from 'src/packages/entities/package.entity';
 import { Repository } from 'typeorm';
 import { PurchasedPackage } from './entities/purchased-package.entity';
 import { PurchasedPackageService } from 'src/purchased-package-services/entities/purchased-package-service.entity';
+import { PurchasedDeal } from 'src/purchased-deals/entities/purchased-deal.entity';
 
 @Injectable()
 export class PurchasedPackagesService {
@@ -18,6 +19,10 @@ export class PurchasedPackagesService {
 
     @InjectRepository(PurchasedPackageService)
     private purchasedPackageServiceRepo: Repository<PurchasedPackageService>,
+
+    @InjectRepository(PurchasedDeal)
+    private purchasedDealRepo:
+      Repository<PurchasedDeal>,
   ) { }
   async buyPackage(
     branchId: string,
@@ -94,6 +99,46 @@ export class PurchasedPackagesService {
       message:
         'Package purchased successfully',
       purchased,
+    };
+  }
+
+  async findByBranch(
+    branchId: string,
+  ) {
+
+    const purchasedPackages =
+      await this.purchasedPackageRepo.find({
+        where: {
+          branch: {
+            id: branchId,
+          },
+        },
+        relations: {
+          package: {
+            services: true,
+          },
+          branch: true,
+        },
+      });
+
+    const purchasedDeals =
+      await this.purchasedDealRepo.find({
+        where: {
+          branch: {
+            id: branchId,
+          },
+        },
+        relations: {
+          deal: {
+            services: true,
+          },
+          branch: true,
+        },
+      });
+
+    return {
+      purchasedPackages,
+      purchasedDeals,
     };
   }
 }

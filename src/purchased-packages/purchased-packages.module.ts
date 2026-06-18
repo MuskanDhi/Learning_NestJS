@@ -6,6 +6,7 @@ import { Branch } from 'src/branches/entities/branch.entity';
 import { Package } from 'src/packages/entities/package.entity';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { PurchasedPackageService } from 'src/purchased-package-services/entities/purchased-package-service.entity';
+import { PurchasedDeal } from 'src/purchased-deals/entities/purchased-deal.entity';
 
 @Module({
   imports: [
@@ -14,6 +15,7 @@ import { PurchasedPackageService } from 'src/purchased-package-services/entities
       PurchasedPackageService,
       Package,
       Branch,
+      PurchasedDeal
     ]),
   ],
   controllers: [PurchasedPackagesController],

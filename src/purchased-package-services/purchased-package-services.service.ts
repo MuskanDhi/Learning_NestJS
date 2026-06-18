@@ -14,58 +14,87 @@ export class PurchasedPackageServicesService {
     dto: CreatePurchasedPackageServiceDto,
   ) {
 
-    const item =
-      await this.purchasedPackageServiceRepo.findOne({
-        where: {
-          purchasedPackage: {
-            id: dto.purchasedPackageId,
+    const serviceIds: string[] = [];
+
+    // Single service
+    if (dto.serviceId) {
+      serviceIds.push(dto.serviceId);
+    }
+
+    // Multiple services
+    if (dto.serviceIds?.length) {
+      serviceIds.push(...dto.serviceIds);
+    }
+
+    if (serviceIds.length === 0) {
+      throw new BadRequestException(
+        'Please provide serviceId or serviceIds',
+      );
+    }
+
+    const usedServices: {
+      id: string;
+      serviceName: string;
+      usedAt: Date;
+    }[] = [];
+
+    for (const serviceId of serviceIds) {
+
+      const item =
+        await this.purchasedPackageServiceRepo.findOne({
+          where: {
+            purchasedPackage: {
+              id: dto.purchasedPackageId,
+            },
+            service: {
+              id: serviceId,
+            },
           },
-          service: {
-            id: dto.serviceId,
+          relations: {
+            service: true,
+            purchasedPackage: true,
           },
-        },
-        relations: {
-          service: true,
-          purchasedPackage: true,
-        },
+        });
+
+      if (!item) {
+        throw new BadRequestException(
+          `Service ${serviceId} not found in package`,
+        );
+      }
+
+      if (
+        item.purchasedPackage.expiryDate &&
+        item.purchasedPackage.expiryDate < new Date()
+      ) {
+        throw new BadRequestException(
+          'Package has expired',
+        );
+      }
+
+      if (item.isUsed) {
+        throw new BadRequestException(
+          `${item.service.serviceName} already used`,
+        );
+      }
+
+      item.isUsed = true;
+      item.usedAt = new Date();
+
+      await this.purchasedPackageServiceRepo.save(
+        item,
+      );
+
+      usedServices.push({
+        id: item.service.id,
+        serviceName: item.service.serviceName,
+        usedAt: item.usedAt,
       });
-
-    if (!item) {
-      throw new BadRequestException(
-        'Service not found in package',
-      );
-    }
-
-    if (item.isUsed) {
-      throw new BadRequestException(
-        'Service already used',
-      );
-    }
-
-    item.isUsed = true;
-    item.usedAt = new Date();
-
-    await this.purchasedPackageServiceRepo.save(
-      item,
-    );
-
-    if (
-      item.purchasedPackage.expiryDate <
-      new Date()
-    ) {
-      throw new BadRequestException(
-        'Package has expired',
-      );
     }
 
     return {
       success: true,
-      message: 'Service used successfully',
-      service: {
-        id: item.service.id,
-        serviceName: item.service.serviceName,
-        usedAt: item.usedAt,
-      },
+      message: 'Service(s) used successfully',
+      services: usedServices,
     };
   }
 }

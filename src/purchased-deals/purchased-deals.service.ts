@@ -44,17 +44,13 @@ export class PurchasedDealsService {
       throw new Error(`Deal with ID ${dto.dealId} does not belong to branch ${branchId}`);
     }
 
-    const expiryDate = new Date();
-
-    expiryDate.setDate(
-      expiryDate.getDate() + 30,
-    );
-
     const purchasedDeal =
       this.purchasedDealRepo.create({
         deal,
         branch: deal.branch,
-        expiryDate,
+        purchasedAt: new Date(),
+        expiryDate: new Date(deal.endDate),
+        status: 'active',
       });
 
     await this.purchasedDealRepo.save(

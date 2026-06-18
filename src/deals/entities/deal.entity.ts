@@ -16,6 +16,7 @@ export class Deal {
     @Column()
     offeredPrice: string;
 
+    // { type: 'date' }
     @Column()
     startDate: string;
 
