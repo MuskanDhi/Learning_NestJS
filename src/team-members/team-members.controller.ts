@@ -8,6 +8,7 @@ import {
     Get,
     Patch,
     Delete,
+    Query,
 } from '@nestjs/common';
 
 import { TeamMembersService } from './team-members.service';
@@ -62,12 +63,27 @@ export class TeamMembersController {
     @UseGuards(JwtAuthGuard)
     @Delete(':id')
     remove(
-        @Param('id') id:string,
+        @Param('id') id: string,
         @Req() req,
-    ){
+    ) {
         return this.teamMembersService.remove(
             id,
             req.user.id,
         )
+    }
+
+    @UseGuards(JwtAuthGuard)
+    @Get(':teamMemberId/available-slots')
+    getAvailableSlots(
+        @Param('teamMemberId')
+        teamMemberId: string,
+
+        @Query('date')
+        date: string,
+    ) {
+        return this.teamMembersService.getAvailableSlots(
+            teamMemberId,
+            date,
+        );
     }
 }

@@ -109,24 +109,6 @@ export class AppointmentsService {
             );
         }
 
-        // const service =
-        //     await this.serviceRepository.findOne({
-        //         where: {
-        //             id: dto.serviceId,
-        //             branch: {
-        //                 id: branchId,
-        //             },
-        //         },
-        //     });
-        // const service =
-        //     await this.serviceRepository.findOne({
-        //         where: {
-        //             id: dto.serviceId,
-        //         },
-        //         relations: {
-        //             branch: true,
-        //         },
-        //     });
         const service = await this.serviceRepository.findOne({
             where: { id: dto.serviceId },
             relations: {
@@ -138,11 +120,6 @@ export class AppointmentsService {
         console.log('BRANCH:', service?.branch);
         console.log('REQUEST BRANCH:', branchId);
 
-        // if (!service) {
-        //     throw new BadRequestException(
-        //         'Service does not belong to this branch',
-        //     );
-        // }
         if (!service) {
             throw new BadRequestException('Service not found');
         }
@@ -188,16 +165,6 @@ export class AppointmentsService {
             );
         }
 
-        // const startMinutes =
-        //     this.timeToMinutes(
-        //         dto.appointmentStartTime,
-        //     );
-
-        // const endMinutes =
-        //     startMinutes +
-        //     Number(service.duration);
-
-        // const slots: string[] = [];
         const startMinutes =
             this.timeToMinutes(
                 dto.appointmentStartTime,

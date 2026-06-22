@@ -367,4 +367,106 @@ export class TeamMembersService {
         }
     }
 
+    async getAvailableSlots(
+        teamMemberId: string,
+        date: string,
+    ) {
+        const teamMember =
+            await this.teamMemberRepo.findOne({
+                where: {
+                    id: teamMemberId,
+                },
+            });
+
+        if (!teamMember) {
+            throw new NotFoundException(
+                'Team member not found',
+            );
+        }
+
+        const selectedDate = new Date(date);
+
+        const dayName =
+            selectedDate.toLocaleDateString(
+                'en-US',
+                {
+                    weekday: 'long',
+                },
+            );
+
+        const schedules =
+            await this.teamMemberScheduleRepo.find({
+                where: {
+                    teamMember: {
+                        id: teamMemberId,
+                    },
+                    day: dayName,
+                },
+            });
+
+        if (!schedules.length) {
+            throw new BadRequestException(
+                `${dayName} schedule not found`,
+            );
+        }
+
+        if (schedules.every(slot => slot.isOff)) {
+            throw new BadRequestException(
+                `${dayName} is off day`,
+            );
+        }
+
+        const availableSlots: {
+            startTime: string;
+            endTime: string;
+        }[] = [];
+
+        const today = new Date();
+
+        for (const schedule of schedules) {
+            if (schedule.isOff) {
+                continue;
+            }
+
+            // Apply this only if the selected date is today
+            const isToday =
+                selectedDate.toDateString() ===
+                today.toDateString();
+
+            if (isToday) {
+                const [time, modifier] =
+                    schedule.startTime.split(' ');
+
+                let [hours, minutes] =
+                    time.split(':').map(Number);
+
+                if (modifier === 'PM' && hours !== 12) {
+                    hours += 12;
+                }
+
+                if (modifier === 'AM' && hours === 12) {
+                    hours = 0;
+                }
+
+                const slotDate = new Date();
+                slotDate.setHours(hours, minutes, 0, 0);
+
+                if (slotDate <= today) {
+                    continue;
+                }
+            }
+
+            availableSlots.push({
+                startTime: schedule.startTime,
+                endTime: schedule.endTime,
+            });
+        }
+
+        return {
+            teamMemberId,
+            date,
+            day: dayName,
+            availableSlots,
+        };
+    }
 }

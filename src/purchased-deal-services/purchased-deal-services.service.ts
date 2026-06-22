@@ -1,35 +1,32 @@
-import {
-  BadRequestException,
-  Injectable,
-} from '@nestjs/common';
-import { CreatePurchasedPackageServiceDto } from './dto/create-purchased-package-service.dto';
-import { PurchasedPackageService } from './entities/purchased-package-service.entity';
-import { PurchasedPackage } from 'src/purchased-packages/entities/purchased-package.entity';
+import { BadRequestException, Injectable } from '@nestjs/common';
+import { CreatePurchasedDealServiceDto } from './dto/create-purchased-deal-service.dto';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
 import { TeamMember } from 'src/team-members/entities/team-member.entity';
+import { Repository } from 'typeorm';
+import { PurchasedDeal } from 'src/purchased-deals/entities/purchased-deal.entity';
+import { PurchasedDealService } from './entities/purchased-deal-service.entity';
 
 @Injectable()
-export class PurchasedPackageServicesService {
+export class PurchasedDealServicesService {
   constructor(
-    @InjectRepository(PurchasedPackageService)
-    private purchasedPackageServiceRepo: Repository<PurchasedPackageService>,
+    @InjectRepository(PurchasedDealService)
+    private purchasedDealServiceRepo: Repository<PurchasedDealService>,
 
-    @InjectRepository(PurchasedPackage)
-    private purchasedPackageRepo: Repository<PurchasedPackage>,
+    @InjectRepository(PurchasedDeal)
+    private purchasedDealRepo: Repository<PurchasedDeal>,
 
     @InjectRepository(TeamMember)
     private teamMemberRepo: Repository<TeamMember>,
-  ) { }
+  ) {}
 
   async useService(
     branchId: string,
-    dto: CreatePurchasedPackageServiceDto,
+    dto: CreatePurchasedDealServiceDto,
   ) {
-    const purchasedPackage =
-      await this.purchasedPackageRepo.findOne({
+    const purchasedDeal =
+      await this.purchasedDealRepo.findOne({
         where: {
-          id: dto.purchasedPackageId,
+          id: dto.purchasedDealId,
           branch: {
             id: branchId,
           },
@@ -39,9 +36,9 @@ export class PurchasedPackageServicesService {
         },
       });
 
-    if (!purchasedPackage) {
+    if (!purchasedDeal) {
       throw new BadRequestException(
-        'Purchased package not found for this branch',
+        'Purchased deal not found for this branch',
       );
     }
 
@@ -82,16 +79,16 @@ export class PurchasedPackageServicesService {
 
     if (!teamMember) {
       throw new BadRequestException(
-        'Team member not found',
+        'Team member not found for this branch',
       );
     }
 
     for (const serviceId of serviceIds) {
       const item =
-        await this.purchasedPackageServiceRepo.findOne({
+        await this.purchasedDealServiceRepo.findOne({
           where: {
-            purchasedPackage: {
-              id: dto.purchasedPackageId,
+            purchasedDeal: {
+              id: dto.purchasedDealId,
             },
             service: {
               id: serviceId,
@@ -99,27 +96,27 @@ export class PurchasedPackageServicesService {
           },
           relations: {
             service: true,
-            purchasedPackage: true,
+            purchasedDeal: true,
             teamMember: true,
           },
         });
 
       if (!item) {
         throw new BadRequestException(
-          `Service ${serviceId} not found in package`,
+          `Service with id ${serviceId} not found in this purchased deal`,
         );
       }
 
-      if (
-        item.purchasedPackage.expiryDate &&
-        item.purchasedPackage.expiryDate < new Date()
+      if(
+        item.purchasedDeal.expiryDate &&
+        item.purchasedDeal.expiryDate < new Date()
       ) {
         throw new BadRequestException(
-          'Package has expired',
+          `Deal has expired`,
         );
       }
 
-      if (item.isUsed) {
+      if(item.isUsed) {
         throw new BadRequestException(
           `${item.service.serviceName} already used`,
         );
@@ -127,38 +124,32 @@ export class PurchasedPackageServicesService {
 
       item.isUsed = true;
       item.usedAt = new Date();
-      item.teamMember = teamMember;
       item.appointmentDate = dto.appointmentDate;
       item.startTime = dto.startTime;
+      item.teamMember = teamMember;
 
-      // If you added these columns in entity
-      // item.teamMemberId = dto.teamMemberId;
-      // item.startTime = new Date(dto.startTime);
+      await this.purchasedDealServiceRepo.save(item);
 
-      await this.purchasedPackageServiceRepo.save(
-        item,
-      );
-
-      usedServices.push({
-        id: item.service.id,
-        serviceName: item.service.serviceName,
-        teamMember,
-        appointmentDate: dto.appointmentDate,
-        startTime: dto.startTime,
-        usedAt: item.usedAt,
-      });
+       usedServices.push({
+         id: item.service.id,
+         serviceName: item.service.serviceName,
+         teamMember,
+         appointmentDate: dto.appointmentDate,
+         startTime: dto.startTime,
+         usedAt: item.usedAt,
+       });
     }
 
-    return {
+    return{
       success: true,
       branchId,
-      purchasedPackageId:
-        dto.purchasedPackageId,
+      purchasedDealId:
+        dto.purchasedDealId,
       teamMember: dto.teamMemberId,
       startTime: dto.startTime,
       message:
         'Service(s) used successfully',
-      services: usedServices,
+        services: usedServices,
     };
   }
 }

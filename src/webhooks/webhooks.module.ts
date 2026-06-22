@@ -5,6 +5,8 @@ import { Cart } from 'src/add-services-into-cart/entities/add-services-into-cart
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { PurchasedPackage } from 'src/purchased-packages/entities/purchased-package.entity';
 import { PurchasedDeal } from 'src/purchased-deals/entities/purchased-deal.entity';
+import { PurchasedPackageService } from 'src/purchased-package-services/entities/purchased-package-service.entity';
+import { PurchasedDealService } from 'src/purchased-deal-services/entities/purchased-deal-service.entity';
 
 @Module({
   imports: [
@@ -12,6 +14,8 @@ import { PurchasedDeal } from 'src/purchased-deals/entities/purchased-deal.entit
       Cart,
       PurchasedDeal,
       PurchasedPackage,
+      PurchasedPackageService,
+      PurchasedDealService,
     ]),
   ],
   controllers: [WebhookController],

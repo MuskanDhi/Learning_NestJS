@@ -4,7 +4,9 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Cart } from 'src/add-services-into-cart/entities/add-services-into-cart.entity';
+import { PurchasedDealService } from 'src/purchased-deal-services/entities/purchased-deal-service.entity';
 import { PurchasedDeal } from 'src/purchased-deals/entities/purchased-deal.entity';
+import { PurchasedPackageService } from 'src/purchased-package-services/entities/purchased-package-service.entity';
 import { PurchasedPackage } from 'src/purchased-packages/entities/purchased-package.entity';
 import { Repository } from 'typeorm';
 
@@ -22,6 +24,12 @@ export class PaymentWebhookService {
 
     @InjectRepository(PurchasedDeal)
     private readonly purchasedDealRepository: Repository<PurchasedDeal>,
+
+    @InjectRepository(PurchasedPackageService)
+    private readonly purchasedPackageServiceRepository: Repository<PurchasedPackageService>,
+
+    @InjectRepository(PurchasedDealService)
+    private readonly purchasedDealServiceRepository: Repository<PurchasedDealService>
   ) { }
 
   async handleWebhook(
@@ -110,6 +118,16 @@ export class PaymentWebhookService {
         where: {
           id: cartId,
         },
+        relations: {
+          user: true,
+          branch: true,
+          package: {
+            services: true,
+          },
+          deal: {
+            services: true,
+          },
+        },
       });
 
     if (!cart) {
@@ -132,19 +150,53 @@ export class PaymentWebhookService {
 
       if (!existingPackagePurchase) {
 
-        await this.purchasedPackageRepository.save({
-          user: cart.user,
-          package: cart.package,
-          branch: cart.branch,
-          paymentId,
-          status: 'SUCCESS',
-        });
+        let expiryDate = new Date();
+
+        if (cart.package.unit === 'day') {
+          expiryDate.setDate(
+            expiryDate.getDate() +
+            cart.package.number,
+          );
+        }
+
+        if (cart.package.unit === 'month') {
+          expiryDate.setMonth(
+            expiryDate.getMonth() +
+            cart.package.number,
+          );
+        }
+
+        if (cart.package.unit === 'year') {
+          expiryDate.setFullYear(
+            expiryDate.getFullYear() +
+            cart.package.number,
+          );
+        }
+
+        const purchasedPackage =
+          await this.purchasedPackageRepository.save({
+            user: cart.user,
+            package: cart.package,
+            branch: cart.branch,
+            paymentId,
+            status: 'SUCCESS',
+            expiryDate,
+          });
+
+        for (const service of cart.package.services) {
+          await this.purchasedPackageServiceRepository.save({
+            purchasedPackage,
+            service,
+            isUsed: false,
+          });
+        }
 
         this.logger.log(
           `Purchased Package Created:
-         packageId=${cart.package.id}`,
+       packageId=${cart.package.id}`,
         );
       }
+
       await this.cartRepository.delete(cart.id);
     }
 
@@ -160,13 +212,25 @@ export class PaymentWebhookService {
 
       if (!existingDealPurchase) {
 
+        const expiryDate = new Date(cart.deal.endDate);
+
+        const purchasedDeal =
         await this.purchasedDealRepository.save({
           user: cart.user,
           deal: cart.deal,
           branch: cart.branch,
           paymentId,
           status: 'SUCCESS',
+          expiryDate
         });
+
+        for(const service of cart.deal.services){
+          await this.purchasedDealServiceRepository.save({
+            purchasedDeal,
+            service,
+            isUsed: false,
+          });
+        }
 
         this.logger.log(
           `Purchased Deal Created:

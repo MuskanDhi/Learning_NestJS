@@ -24,5 +24,9 @@ export class CreatePurchasedPackageServiceDto {
 
   @IsNotEmpty()
   @IsString()
+  appointmentDate: string;
+
+  @IsNotEmpty()
+  @IsString()
   startTime: string;
 }

@@ -1,27 +1,22 @@
-import {
-    Column,
-    Entity,
-    ManyToOne,
-    PrimaryGeneratedColumn,
-} from "typeorm";
-import { PurchasedPackage } from "src/purchased-packages/entities/purchased-package.entity";
+import { PurchasedDeal } from "src/purchased-deals/entities/purchased-deal.entity";
 import { Service } from "src/services/entities/services.entity";
 import { TeamMember } from "src/team-members/entities/team-member.entity";
+import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
 
-@Entity('purchased_package_services')
-export class PurchasedPackageService {
+@Entity('purchased_deal_services')
+export class PurchasedDealService {
 
     @PrimaryGeneratedColumn('uuid')
     id: string;
 
     @ManyToOne(
-        () => PurchasedPackage,
+        () => PurchasedDeal,
         purchased => purchased.services,
         {
             onDelete: 'CASCADE',
         },
     )
-    purchasedPackage: PurchasedPackage;
+    purchasedDeal: PurchasedDeal;
 
     @ManyToOne(() => Service)
     service: Service;

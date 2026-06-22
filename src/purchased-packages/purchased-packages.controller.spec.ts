@@ -18,34 +18,3 @@ describe('PurchasedPackagesController', () => {
     expect(controller).toBeDefined();
   });
 });
-
-import {
-    Entity,
-    PrimaryGeneratedColumn,
-    Column,
-    CreateDateColumn,
-} from 'typeorm';
-
-@Entity('purchased_packages')
-export class PurchasedPackage {
-
-    @PrimaryGeneratedColumn('uuid')
-    id: string;
-
-    @Column()
-    userId: string;
-
-    @Column()
-    packageId: string;
-
-    @Column({ unique: true })
-    paymentId: string;
-
-    @Column({
-        default: 'SUCCESS',
-    })
-    status: string;
-
-    @CreateDateColumn()
-    purchasedAt: Date;
-}

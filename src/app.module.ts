@@ -31,6 +31,7 @@ import { PurchasedDealsModule } from './purchased-deals/purchased-deals.module';
 import { AddServicesIntoCartModule } from './add-services-into-cart/add-services-into-cart.module';
 import { WebhooksModule } from './webhooks/webhooks.module';
 import { PurchasedPackageServicesModule } from './purchased-package-services/purchased-package-services.module';
+import { PurchasedDealServicesModule } from './purchased-deal-services/purchased-deal-services.module';
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -76,6 +77,7 @@ import { PurchasedPackageServicesModule } from './purchased-package-services/pur
     WebhooksModule,
     PurchasedPackagesModule,
     PurchasedPackageServicesModule,
+    PurchasedDealServicesModule,
   ],
   controllers: [AppController],
   providers: [AppService, NotificationGateway],
