@@ -6,17 +6,21 @@ import { AuthModule } from 'src/auth/auth.module';
 import { Service } from 'src/services/entities/services.entity';
 import { Cart } from './entities/add-services-into-cart.entity';
 import { User } from 'src/users/entities/user.entity';
+import { Deal } from 'src/deals/entities/deal.entity';
+import { Package } from 'src/packages/entities/package.entity';
 
 @Module({
-  imports: [
-          TypeOrmModule.forFeature([
-              Service,
-              User,
-              Cart
-          ]),
-          AuthModule,
-      ],
-  controllers: [AddServicesIntoCartController],
-  providers: [AddServicesIntoCartService],
+    imports: [
+        TypeOrmModule.forFeature([
+            Service,
+            User,
+            Cart,
+            Package,
+            Deal,
+        ]),
+        AuthModule,
+    ],
+    controllers: [AddServicesIntoCartController],
+    providers: [AddServicesIntoCartService],
 })
-export class AddServicesIntoCartModule {}
+export class AddServicesIntoCartModule { }

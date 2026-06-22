@@ -1,30 +1,71 @@
-import { Branch } from "src/branches/entities/branch.entity";
-import { Service } from "src/services/entities/services.entity";
-import { User } from "src/users/entities/user.entity";
-import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
+import {
+    Entity,
+    PrimaryGeneratedColumn,
+    ManyToOne,
+    CreateDateColumn,
+    Column,
+} from 'typeorm';
 
-@Entity()
+import { User } from 'src/users/entities/user.entity';
+import { Branch } from 'src/branches/entities/branch.entity';
+import { Service } from 'src/services/entities/services.entity';
+import { Package } from 'src/packages/entities/package.entity';
+import { Deal } from 'src/deals/entities/deal.entity';
+
+@Entity('cart')
 export class Cart {
 
     @PrimaryGeneratedColumn('uuid')
     id: string;
 
-    @ManyToOne(() => User)
+    @ManyToOne(
+        () => User,
+        {
+            eager: true,
+            onDelete: 'CASCADE',
+        },
+    )
     user: User;
 
-    @ManyToOne(() => Branch)
+    @ManyToOne(
+        () => Branch,
+        {
+            eager: true,
+            onDelete: 'CASCADE',
+        },
+    )
     branch: Branch;
 
-    @ManyToOne(() => Service)
-    service: Service;
+    @Column()
+    type: string;
 
-    @Column({
-        nullable: true,
-    })
-    type: string; // package | deal
+    @ManyToOne(
+        () => Service,
+        {
+            nullable: true,
+            eager: true,
+        },
+    )
+    service?: Service;
 
-    @Column({
-        nullable: true,
-    })
-    referenceId: string;
+    @ManyToOne(
+        () => Package,
+        {
+            nullable: true,
+            eager: true,
+        },
+    )
+    package?: Package;
+
+    @ManyToOne(
+        () => Deal,
+        {
+            nullable: true,
+            eager: true,
+        },
+    )
+    deal?: Deal;
+
+    @CreateDateColumn()
+    createdAt: Date;
 }

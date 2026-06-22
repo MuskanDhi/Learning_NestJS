@@ -1,3 +1,3 @@
-export class BuyDealDto {
-    dealId: string;
-}
+// export class BuyDealDto {
+//     dealId: string;
+// }

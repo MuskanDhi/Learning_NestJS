@@ -28,8 +28,9 @@ import { NotificationModule } from './notification/notification.module';
 import { RedisModule } from './redis/redis.module';
 import { PurchasedPackagesModule } from './purchased-packages/purchased-packages.module';
 import { PurchasedDealsModule } from './purchased-deals/purchased-deals.module';
-import { PurchasedPackageServicesModule } from './purchased-package-services/purchased-package-services.module';
 import { AddServicesIntoCartModule } from './add-services-into-cart/add-services-into-cart.module';
+import { WebhooksModule } from './webhooks/webhooks.module';
+import { PurchasedPackageServicesModule } from './purchased-package-services/purchased-package-services.module';
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -71,8 +72,10 @@ import { AddServicesIntoCartModule } from './add-services-into-cart/add-services
     RedisModule,
     PurchasedPackagesModule,
     PurchasedDealsModule,
-    PurchasedPackageServicesModule,
     AddServicesIntoCartModule,
+    WebhooksModule,
+    PurchasedPackagesModule,
+    PurchasedPackageServicesModule,
   ],
   controllers: [AppController],
   providers: [AppService, NotificationGateway],

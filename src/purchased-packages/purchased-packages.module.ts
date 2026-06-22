@@ -5,14 +5,12 @@ import { PurchasedPackage } from './entities/purchased-package.entity';
 import { Branch } from 'src/branches/entities/branch.entity';
 import { Package } from 'src/packages/entities/package.entity';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { PurchasedPackageService } from 'src/purchased-package-services/entities/purchased-package-service.entity';
 import { PurchasedDeal } from 'src/purchased-deals/entities/purchased-deal.entity';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([
       PurchasedPackage,
-      PurchasedPackageService,
       Package,
       Branch,
       PurchasedDeal

@@ -16,3 +16,4 @@ describe('PurchasedDealsService', () => {
     expect(service).toBeDefined();
   });
 });
+

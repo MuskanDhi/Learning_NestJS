@@ -1,7 +1,7 @@
 import {
-  IsOptional,
   IsString,
   IsEnum,
+  IsNotEmpty,
 } from 'class-validator';
 
 export class CreateAddServicesIntoCartDto {
@@ -9,11 +9,11 @@ export class CreateAddServicesIntoCartDto {
   @IsString()
   serviceId: string;
 
-  @IsOptional()
-  @IsEnum(['package', 'deal'])
-  type?: 'package' | 'deal';
+  @IsNotEmpty()
+  @IsEnum(['service', 'package', 'deal'])
+  type?: 'service' | 'package' | 'deal';
 
-  @IsOptional()
+  @IsNotEmpty()
   @IsString()
   referenceId?: string;
 }

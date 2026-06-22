@@ -1,38 +1,47 @@
 import {
-    Entity,
-    PrimaryGeneratedColumn,
-    ManyToOne,
-    CreateDateColumn,
-    Column,
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  CreateDateColumn,
+  ManyToOne,
 } from 'typeorm';
+
+import { User } from 'src/users/entities/user.entity';
 import { Deal } from 'src/deals/entities/deal.entity';
 import { Branch } from 'src/branches/entities/branch.entity';
 
 @Entity('purchased_deals')
 export class PurchasedDeal {
 
-    @PrimaryGeneratedColumn('uuid')
-    id: string;
+  @PrimaryGeneratedColumn('uuid')
+  id: string;
 
-    @ManyToOne(() => Deal, {
-        eager: true,
-    })
-    deal: Deal;
+  @ManyToOne(() => User, {
+    eager: true,
+    onDelete: 'CASCADE',
+  })
+  user: User;
 
-    @ManyToOne(() => Branch, {
-        eager: true,
-    })
-    branch: Branch;
+  @ManyToOne(() => Deal, {
+    eager: true,
+    onDelete: 'CASCADE',
+  })
+  deal: Deal;
 
-    @CreateDateColumn()
-    purchasedAt: Date;
+  @ManyToOne(() => Branch, {
+    eager: true,
+    onDelete: 'CASCADE',
+  })
+  branch: Branch;
 
-    @Column()
-    expiryDate: Date;
+  @Column({ unique: true })
+  paymentId: string;
 
-    @Column({
-        default: 'active',
-    })
-    status: string;
+  @Column({
+    default: 'SUCCESS',
+  })
+  status: string;
+
+  @CreateDateColumn()
+  purchasedAt: Date;
 }
-
