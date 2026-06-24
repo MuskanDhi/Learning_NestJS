@@ -13,7 +13,7 @@ export class AppointmentsController {
 
     constructor(
         private readonly appointmentsService: AppointmentsService,
-    ) {}
+    ) { }
 
     @Post(':branchId')
     create(
@@ -25,4 +25,24 @@ export class AppointmentsController {
             dto,
         );
     }
+
+    // @Post(':appointmentId/start')
+    // startJob(
+    //     @Param('appointmentId')
+    //     appointmentId: string,
+    // ) {
+    //     return this.appointmentsService.startJob(
+    //         appointmentId,
+    //     );
+    // }
+
+    // @Post(':appointmentId/complete')
+    // completeJob(
+    //     @Param('appointmentId')
+    //     appointmentId: string,
+    // ) {
+    //     return this.appointmentsService.completeJob(
+    //         appointmentId,
+    //     );
+    // }
 }

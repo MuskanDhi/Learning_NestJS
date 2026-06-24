@@ -236,4 +236,79 @@ export class AppointmentsService {
             },
         };
     }
+
+    // async startJob(
+    //     appointmentId: string,
+    // ) {
+    //     const appointment =
+    //         await this.appointmentRepository.findOne({
+    //             where: {
+    //                 id: appointmentId,
+    //             },
+    //         });
+
+    //     if (!appointment) {
+    //         throw new BadRequestException(
+    //             'Appointment not found',
+    //         );
+    //     }
+
+    //     if (appointment.status !== 'BOOKED') {
+    //         throw new BadRequestException(
+    //             'Job cannot be started',
+    //         );
+    //     }
+
+    //     appointment.status = 'IN_PROGRESS';
+    //     appointment.jobStartedAt = new Date();
+
+    //     await this.appointmentRepository.save(
+    //         appointment,
+    //     );
+
+    //     return {
+    //         success: true,
+    //         message: 'Job started successfully',
+    //         appointment,
+    //     };
+    // }
+
+    // async completeJob(
+    //     appointmentId: string,
+    // ) {
+    //     const appointment =
+    //         await this.appointmentRepository.findOne({
+    //             where: {
+    //                 id: appointmentId,
+    //             },
+    //         });
+
+    //     if (!appointment) {
+    //         throw new BadRequestException(
+    //             'Appointment not found',
+    //         );
+    //     }
+
+    //     if (
+    //         appointment.status !== 'IN_PROGRESS'
+    //     ) {
+    //         throw new BadRequestException(
+    //             'Job has not started',
+    //         );
+    //     }
+
+    //     appointment.status = 'COMPLETED';
+    //     appointment.jobCompletedAt =
+    //         new Date();
+
+    //     await this.appointmentRepository.save(
+    //         appointment,
+    //     );
+
+    //     return {
+    //         success: true,
+    //         message: 'Job completed successfully',
+    //         appointment,
+    //     };
+    // }
 }

@@ -4,6 +4,7 @@ import {
     Column,
     ManyToOne,
     JoinColumn,
+    CreateDateColumn,
 } from 'typeorm';
 
 import { Branch } from 'src/branches/entities/branch.entity';
@@ -26,6 +27,27 @@ export class Appointment {
 
     @Column('simple-array')
     slots: string[];
+
+    // BOOKED → IN_PROGRESS → COMPLETED → CANCELLED
+    @Column({
+        default: 'BOOKED',
+    })
+    status: string;
+
+    @Column({
+        type: 'timestamp',
+        nullable: true,
+    })
+    jobStartedAt: Date;
+
+    @Column({
+        type: 'timestamp',
+        nullable: true,
+    })
+    jobCompletedAt: Date;
+
+    @CreateDateColumn()
+    createdAt: Date;
 
     @ManyToOne(() => Salon)
     @JoinColumn()
