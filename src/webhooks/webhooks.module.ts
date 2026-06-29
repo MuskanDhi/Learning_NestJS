@@ -7,6 +7,7 @@ import { PurchasedPackage } from 'src/purchased-packages/entities/purchased-pack
 import { PurchasedDeal } from 'src/purchased-deals/entities/purchased-deal.entity';
 import { PurchasedPackageService } from 'src/purchased-package-services/entities/purchased-package-service.entity';
 import { PurchasedDealService } from 'src/purchased-deal-services/entities/purchased-deal-service.entity';
+import { Appointment } from 'src/appointments/entities/appointment.entity';
 
 @Module({
   imports: [
@@ -16,6 +17,7 @@ import { PurchasedDealService } from 'src/purchased-deal-services/entities/purch
       PurchasedPackage,
       PurchasedPackageService,
       PurchasedDealService,
+      Appointment
     ]),
   ],
   controllers: [WebhookController],

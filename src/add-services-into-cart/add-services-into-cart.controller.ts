@@ -2,11 +2,12 @@ import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, Req } fro
 import { AddServicesIntoCartService } from './add-services-into-cart.service';
 import { CreateAddServicesIntoCartDto } from './dto/create-add-services-into-cart.dto';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
+import { SelectSlotDto } from './dto/select-slot.dto';
 
 @Controller('add-services-into-cart')
 export class AddServicesIntoCartController {
-  constructor(private readonly addServicesIntoCartService: AddServicesIntoCartService) {}
-  
+  constructor(private readonly addServicesIntoCartService: AddServicesIntoCartService) { }
+
   @Post(':branchId')
   @UseGuards(JwtAuthGuard)
   addServiceToCart(
@@ -16,9 +17,9 @@ export class AddServicesIntoCartController {
   ) {
     const userId = req.user.id;
     return this.addServicesIntoCartService.addServiceToCart(
-    branchId,
-    req.user.id,
-    dto,
+      branchId,
+      req.user.id,
+      dto,
     );
   }
 
@@ -27,5 +28,16 @@ export class AddServicesIntoCartController {
   getCart(@Param('branchId') branchId: string, @Req() req) {
     const userId = req.user.id;
     return this.addServicesIntoCartService.getCart(branchId, userId);
+  }
+
+  @Post(':cartId/select-slot')
+  selectSlot(
+    @Param('cartId') cartId: string,
+    @Body() dto: SelectSlotDto,
+  ) {
+    return this.addServicesIntoCartService.selectSlot(
+      cartId,
+      dto,
+    );
   }
 }

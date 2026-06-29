@@ -7,6 +7,7 @@ import { Customer } from 'src/customers/entities/customer.entity';
 import { Service } from 'src/services/entities/services.entity';
 import { TeamMember } from 'src/team-members/entities/team-member.entity';
 import { CreateAppointmentDto } from './dto/create-appointment.dto';
+import { Category } from 'src/categories/entities/category.entity';
 
 @Injectable()
 export class AppointmentsService {
@@ -190,13 +191,14 @@ export class AppointmentsService {
 
         const appointment =
             this.appointmentRepository.create({
+                appointmentDate:
+                    dto.appointmentDate,
+
                 appointmentStartTime:
                     dto.appointmentStartTime,
 
                 appointmentEndTime:
-                    this.minutesToTime(
-                        endMinutes,
-                    ),
+                    this.minutesToTime(endMinutes),
 
                 slots,
 
@@ -206,7 +208,7 @@ export class AppointmentsService {
 
                 customer,
 
-                service,
+                services: [service],
 
                 teamMember,
             });

@@ -5,6 +5,8 @@ import {
     ManyToOne,
     JoinColumn,
     CreateDateColumn,
+    ManyToMany,
+    JoinTable,
 } from 'typeorm';
 
 import { Branch } from 'src/branches/entities/branch.entity';
@@ -19,13 +21,22 @@ export class Appointment {
     @PrimaryGeneratedColumn('uuid')
     id: string;
 
+    @Column({
+        nullable: true,
+    })
+    appointmentDate: string;
+
     @Column()
     appointmentStartTime: string;
 
-    @Column()
+    @Column({
+        nullable: true,
+    })
     appointmentEndTime: string;
 
-    @Column('simple-array')
+    @Column('simple-array',{
+        nullable: true,
+    })
     slots: string[];
 
     // BOOKED → IN_PROGRESS → COMPLETED → CANCELLED
@@ -49,7 +60,9 @@ export class Appointment {
     @CreateDateColumn()
     createdAt: Date;
 
-    @ManyToOne(() => Salon)
+    @ManyToOne(() => Salon,{
+        nullable: true,
+    })
     @JoinColumn()
     salon: Salon;
 
@@ -57,13 +70,17 @@ export class Appointment {
     @JoinColumn()
     branch: Branch;
 
-    @ManyToOne(() => Customer)
+    @ManyToOne(() => Customer,{
+        nullable: true,
+    })
     @JoinColumn()
     customer: Customer;
 
-    @ManyToOne(() => Service)
-    @JoinColumn()
-    service: Service;
+    @ManyToMany(() => Service, {
+        eager: true,
+    })
+    @JoinTable()
+    services: Service[];
 
     @ManyToOne(() => TeamMember)
     @JoinColumn()

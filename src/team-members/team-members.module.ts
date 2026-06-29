@@ -7,6 +7,8 @@ import { Service } from 'src/services/entities/services.entity';
 import { Branch } from 'src/branches/entities/branch.entity';
 import { TeamMember } from './entities/team-member.entity';
 import { TeamMemberSchedule } from 'team-member-schedules';
+import { Appointment } from 'src/appointments/entities/appointment.entity';
+import { Cart } from 'src/add-services-into-cart/entities/add-services-into-cart.entity';
 
 @Module({
         imports: [
@@ -14,7 +16,9 @@ import { TeamMemberSchedule } from 'team-member-schedules';
               Service,
               Branch,
               TeamMember,
-              TeamMemberSchedule
+              TeamMemberSchedule,
+              Appointment,
+              Cart
           ]),
           AuthModule
       ],

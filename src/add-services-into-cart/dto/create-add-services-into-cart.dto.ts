@@ -16,4 +16,6 @@ export class CreateAddServicesIntoCartDto {
   @IsNotEmpty()
   @IsString()
   referenceId?: string;
+
+  customerId: string;
 }

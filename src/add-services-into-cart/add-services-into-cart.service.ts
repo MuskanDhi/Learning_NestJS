@@ -7,6 +7,9 @@ import { Service } from 'src/services/entities/services.entity';
 import { Cart } from './entities/add-services-into-cart.entity';
 import { Package } from 'src/packages/entities/package.entity';
 import { Deal } from 'src/deals/entities/deal.entity';
+import { TeamMember } from 'src/team-members/entities/team-member.entity';
+import { SelectSlotDto } from './dto/select-slot.dto';
+import { Customer } from 'src/customers/entities/customer.entity';
 
 @Injectable()
 export class AddServicesIntoCartService {
@@ -24,7 +27,13 @@ export class AddServicesIntoCartService {
     private packageRepo: Repository<Package>,
 
     @InjectRepository(Deal)
-    private dealRepo: Repository<Deal>
+    private dealRepo: Repository<Deal>,
+
+    @InjectRepository(TeamMember)
+    private teamMemberRepo: Repository<TeamMember>,
+
+    @InjectRepository(Customer)
+    private customerRepo: Repository<Customer>,
 
   ) { }
 
@@ -47,6 +56,18 @@ export class AddServicesIntoCartService {
       );
     }
 
+    const customer = await this.customerRepo.findOne({
+      where: {
+        id: dto.customerId,
+      },
+    });
+
+    if (!customer) {
+      throw new BadRequestException(
+        'Customer not found',
+      );
+    }
+
     let cart: Cart;
 
     if (dto.type === 'service') {
@@ -66,6 +87,7 @@ export class AddServicesIntoCartService {
 
       cart = this.cartRepo.create({
         user,
+        customer,
         branch: {
           id: branchId,
         },
@@ -94,6 +116,7 @@ export class AddServicesIntoCartService {
 
       cart = this.cartRepo.create({
         user,
+        customer,
         branch: {
           id: branchId,
         },
@@ -122,6 +145,7 @@ export class AddServicesIntoCartService {
 
       cart = this.cartRepo.create({
         user,
+        customer,
         branch: {
           id: branchId,
         },
@@ -179,6 +203,118 @@ export class AddServicesIntoCartService {
       totalItems: formattedCart.length,
       message: 'Cart items retrieved successfully',
       cartItems: formattedCart,
+    };
+  }
+
+  // async selectSlot(
+  //   cartId: string,
+  //   dto: SelectSlotDto,
+  // ) {
+  //   const cart = await this.cartRepo.findOne({
+  //     where: {
+  //       id: cartId,
+  //     },
+  //     relations: {
+  //       service: true,
+  //     },
+  //   });
+
+  //   if (!cart) {
+  //     throw new BadRequestException(
+  //       'Cart not found',
+  //     );
+  //   }
+
+  //   const teamMember =
+  //     await this.teamMemberRepo.findOne({
+  //       where: {
+  //         id: dto.teamMemberId,
+  //       },
+  //     });
+
+  //   if (!teamMember) {
+  //     throw new BadRequestException(
+  //       'Team member not found',
+  //     );
+  //   }
+
+  //   cart.teamMember = teamMember;
+  //   cart.appointmentDate =
+  //     dto.appointmentDate;
+  //   cart.startTime =
+  //     dto.startTime;
+
+  //   cart.slotStatus = 'RESERVED';
+
+  //   cart.slotExpiresAt =
+  //     new Date(
+  //       Date.now() + 10 * 60 * 1000,
+  //     );
+
+  //   await this.cartRepo.save(cart);
+
+  //   return {
+  //     success: true,
+  //     message: 'Slot reserved successfully',
+  //     cart,
+  //   };
+  // }
+
+  async selectSlot(
+    cartId: string,
+    dto: SelectSlotDto,
+  ) {
+    const cart = await this.cartRepo.findOne({
+      where: {
+        id: cartId,
+      },
+      relations: {
+        service: true,
+      },
+    });
+
+    if (!cart) {
+      throw new BadRequestException(
+        'Cart not found',
+      );
+    }
+
+    const teamMember =
+      await this.teamMemberRepo.findOne({
+        where: {
+          id: dto.teamMemberId,
+        },
+      });
+
+    if (!teamMember) {
+      throw new BadRequestException(
+        'Team member not found',
+      );
+    }
+
+    cart.teamMember = teamMember;
+
+    cart.appointmentDate =
+      dto.appointmentDate;
+
+    cart.startTime =
+      dto.startTime;
+
+    // HOLD THE SLOT
+    cart.slotStatus = 'HOLD';
+
+    // 10 minutes expiry
+    cart.slotExpiresAt =
+      new Date(
+        Date.now() + 10 * 60 * 1000,
+      );
+
+    await this.cartRepo.save(cart);
+
+    return {
+      success: true,
+      message: 'Slot placed on hold successfully',
+      cart,
     };
   }
 }
