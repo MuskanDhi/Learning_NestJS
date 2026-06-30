@@ -13,6 +13,7 @@ import { SubCategory } from '../../sub-categories/entities/sub-category.entity';
 import { Package } from '../../packages/entities/package.entity';
 import { Deal } from 'src/deals/entities/deal.entity';
 import { Branch } from 'src/branches/entities/branch.entity';
+import { Category } from 'src/categories/entities/category.entity';
 
 @Entity()
 export class Service {
@@ -65,5 +66,15 @@ export class Service {
     )
     @JoinColumn({ name: 'branch_id' })
     branch: Branch;
+
+    @ManyToOne(
+        () => Category,
+        (category) => category.services,
+        {
+            eager: false,
+        },
+    )
+    @JoinColumn()
+    category: Category;
 
 }

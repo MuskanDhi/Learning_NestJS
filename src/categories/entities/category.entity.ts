@@ -8,6 +8,7 @@ import {
 
 import { SubCategory } from '../../sub-categories/entities/sub-category.entity';
 import { Branch } from '../../branches/entities/branch.entity';
+import { Service } from 'src/services/entities/services.entity';
 
 @Entity('categories')
 export class Category {
@@ -34,4 +35,10 @@ export class Category {
         },
     )
     branch: Branch;
+
+    @OneToMany(
+        () => Service,
+        (service) => service.category,
+    )
+    services: Service[];
 }

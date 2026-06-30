@@ -567,7 +567,10 @@ export class TeamMembersService {
             );
         }
 
-        const selectedDate = new Date(date);
+        // const selectedDate = new Date(date);
+        const selectedDate = new Date(
+            `${date}T00:00:00`,
+        );
 
         const dayName =
             selectedDate.toLocaleDateString(
@@ -586,6 +589,16 @@ export class TeamMembersService {
                     day: dayName,
                 },
             });
+
+        console.log('Day Name:', dayName);
+
+        console.log(
+            schedules.map(schedule => ({
+                day: schedule.day,
+                start: schedule.startTime,
+                end: schedule.endTime,
+            })),
+        );
 
         if (!schedules.length) {
             throw new BadRequestException(
@@ -671,40 +684,46 @@ export class TeamMembersService {
                 selectedDate.toDateString() ===
                 now.toDateString();
 
-            if (isToday) {
-                const [time, modifier] =
-                    schedule.startTime.split(' ');
 
-                let [hours, minutes] =
-                    time.split(':').map(Number);
+            console.log('Now:', now);
+            console.log('Selected:', selectedDate);
+            console.log('Is Today:', isToday);
+            console.log('Unavailable:', unavailableSlots);
 
-                if (
-                    modifier === 'PM' &&
-                    hours !== 12
-                ) {
-                    hours += 12;
-                }
+            // if (isToday) {
+            //     const [time, modifier] =
+            //         schedule.startTime.split(' ');
 
-                if (
-                    modifier === 'AM' &&
-                    hours === 12
-                ) {
-                    hours = 0;
-                }
+            //     let [hours, minutes] =
+            //         time.split(':').map(Number);
 
-                const slotTime = new Date();
+            //     if (
+            //         modifier === 'PM' &&
+            //         hours !== 12
+            //     ) {
+            //         hours += 12;
+            //     }
 
-                slotTime.setHours(
-                    hours,
-                    minutes,
-                    0,
-                    0,
-                );
+            //     if (
+            //         modifier === 'AM' &&
+            //         hours === 12
+            //     ) {
+            //         hours = 0;
+            //     }
 
-                if (slotTime <= now) {
-                    continue;
-                }
-            }
+            //     const slotTime = new Date();
+
+            //     slotTime.setHours(
+            //         hours,
+            //         minutes,
+            //         0,
+            //         0,
+            //     );
+
+            //     if (slotTime <= now) {
+            //         continue;
+            //     }
+            // }
 
             // Skip held/reserved/booked slots
             if (
@@ -714,6 +733,13 @@ export class TeamMembersService {
             ) {
                 continue;
             }
+
+            console.log('Now:', now);
+            console.log('Unavailable:', unavailableSlots);
+            console.log('Selected Date:', selectedDate);
+            console.log('Is Today:',
+                selectedDate.toDateString() === now.toDateString(),
+            );
 
             availableSlots.push({
                 startTime: schedule.startTime,

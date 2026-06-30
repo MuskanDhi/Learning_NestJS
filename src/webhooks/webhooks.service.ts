@@ -378,6 +378,41 @@ export class PaymentWebhookService {
     private readonly appointmentRepository: Repository<Appointment>,
   ) { }
 
+  private timeToMinutes(time: string): number {
+    const [timePart, period] = time.split(' ');
+
+    let [hours, minutes] = timePart.split(':').map(Number);
+
+    if (period === 'PM' && hours !== 12) {
+      hours += 12;
+    }
+
+    if (period === 'AM' && hours === 12) {
+      hours = 0;
+    }
+
+    return hours * 60 + minutes;
+  }
+
+  private minutesToTime(totalMinutes: number): string {
+    totalMinutes %= 1440;
+
+    let hours = Math.floor(totalMinutes / 60);
+    const minutes = totalMinutes % 60;
+
+    const period = hours >= 12 ? 'PM' : 'AM';
+
+    hours = hours % 12;
+
+    if (hours === 0) {
+      hours = 12;
+    }
+
+    return `${hours.toString().padStart(2, '0')}:${minutes
+      .toString()
+      .padStart(2, '0')} ${period}`;
+  }
+
   async handleWebhook(
     payload: any,
     signature: string,
@@ -514,14 +549,57 @@ export class PaymentWebhookService {
         });
 
       if (!existingAppointment) {
+        // await this.appointmentRepository.save({
+        //   appointmentDate: cart.appointmentDate,
+
+        //   appointmentStartTime: cart.startTime,
+
+        //   appointmentEndTime: cart.startTime,
+
+        //   slots: [cart.startTime],
+
+        //   status: 'BOOKED',
+
+        //   branch: cart.branch,
+
+        //   salon: cart.branch?.salon,
+
+        //   customer: cart.customer,
+
+        //   teamMember: cart.teamMember,
+
+        //   services: [cart.service],
+        // });
+        const startMinutes = this.timeToMinutes(cart.startTime);
+
+        const durationMinutes = parseInt(
+          cart.service.duration.replace(/\D/g, ''),
+          10,
+        );
+
+        const endMinutes = startMinutes + durationMinutes;
+
+        const appointmentEndTime =
+          this.minutesToTime(endMinutes);
+
+        const slots: string[] = [];
+
+        for (
+          let current = startMinutes;
+          current < endMinutes;
+          current += 15
+        ) {
+          slots.push(this.minutesToTime(current));
+        }
+
         await this.appointmentRepository.save({
           appointmentDate: cart.appointmentDate,
 
           appointmentStartTime: cart.startTime,
 
-          appointmentEndTime: cart.startTime,
+          appointmentEndTime,
 
-          slots: [cart.startTime],
+          slots,
 
           status: 'BOOKED',
 

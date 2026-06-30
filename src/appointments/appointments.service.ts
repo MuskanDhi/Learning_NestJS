@@ -174,8 +174,19 @@ export class AppointmentsService {
         const durationMinutes =
             parseInt(service.duration, 10);
 
+        console.log("Duration:", service.duration);
+        console.log("Parsed:", parseInt(service.duration, 10));
+        console.log("Start Minutes:", startMinutes);
+
         const endMinutes =
             startMinutes + durationMinutes;
+
+        console.log({
+            startMinutes,
+            durationMinutes,
+            endMinutes,
+            endTime: this.minutesToTime(endMinutes),
+        });
 
         const slots: string[] = [];
 

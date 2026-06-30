@@ -84,6 +84,7 @@ export class ServicesService {
                 duration: dto.duration,
                 description: dto.description,
                 subCategory,
+                category: subCategory.category, 
                 branch: subCategory.category.branch,
             });
 

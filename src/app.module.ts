@@ -32,6 +32,8 @@ import { AddServicesIntoCartModule } from './add-services-into-cart/add-services
 import { WebhooksModule } from './webhooks/webhooks.module';
 import { PurchasedPackageServicesModule } from './purchased-package-services/purchased-package-services.module';
 import { PurchasedDealServicesModule } from './purchased-deal-services/purchased-deal-services.module';
+import { ReportsModule } from './reports/reports.module';
+import { RazorpayModule } from './razorpay/razorpay.module';
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -78,6 +80,8 @@ import { PurchasedDealServicesModule } from './purchased-deal-services/purchased
     PurchasedPackagesModule,
     PurchasedPackageServicesModule,
     PurchasedDealServicesModule,
+    ReportsModule,
+    RazorpayModule,
   ],
   controllers: [AppController],
   providers: [AppService, NotificationGateway],
