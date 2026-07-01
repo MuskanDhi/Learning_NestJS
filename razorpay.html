@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <!DOCTYPE html>
+    <html lang="en">
+
+    <head>
+        <meta charset="UTF-8">
+        <title>Razorpay Checkout Test</title>
+
+        <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+
+        <style>
+            body {
+                font-family: Arial;
+                width: 500px;
+                margin: 40px auto;
+            }
+
+            h2 {
+                text-align: center;
+            }
+
+            label {
+                display: block;
+                margin-top: 15px;
+            }
+
+            input {
+                width: 100%;
+                padding: 10px;
+                font-size: 16px;
+                box-sizing: border-box;
+                margin-top: 5px;
+            }
+
+            input[readonly] {
+                background: #f2f2f2;
+            }
+
+            button {
+                width: 100%;
+                padding: 12px;
+                margin-top: 20px;
+                font-size: 18px;
+                cursor: pointer;
+                border: none;
+                color: white;
+                background: #3399cc;
+            }
+
+            button:disabled {
+                background: #999;
+                cursor: not-allowed;
+            }
+
+            button:hover:not(:disabled) {
+                background: #2589b6;
+            }
+
+            .info {
+                margin-top: 20px;
+                background: #f6f6f6;
+                padding: 10px;
+            }
+        </style>
+
+    </head>
+
+<body>
+
+    <h2>Razorpay Checkout Test</h2>
+
+    <label>Razorpay Key</label>
+    <input id="key" value="rzp_test_eR5i8vZrGKVnEB">
+
+    <label>Order ID</label>
+    <input id="orderId" placeholder="order_xxxxxxxxx">
+
+    <button id="loadBtn" onclick="loadOrder()">Load Order</button>
+
+    <label>Amount</label>
+    <input id="amount" readonly>
+
+    <label>Currency</label>
+    <input id="currency" readonly>
+
+    <label>Name</label>
+    <input id="name" value="Muskan">
+
+    <label>Email</label>
+    <input id="email" value="muskan@test.com">
+
+    <label>Contact</label>
+    <input id="contact" value="9876543210">
+
+    <button id="payBtn" onclick="payNow()" disabled>Pay Now</button>
+
+    <div class="info">
+        <b>Response</b>
+        <pre id="response"></pre>
+    </div>
+
+    <script>
+
+        let order = null;
+
+        const payButton = document.getElementById("payBtn");
+        const loadButton = document.getElementById("loadBtn");
+
+        async function loadOrder() {
+            const orderId = document.getElementById("orderId").value.trim();
+
+            if (!orderId) {
+                alert("Please enter Order ID");
+                return;
+            }
+
+            loadButton.disabled = true;
+            loadButton.innerText = "Loading...";
+
+            try {
+                const res = await fetch(`http://localhost:3000/razorpay/order/${orderId}`);
+                console.log("STATUS:", res.status);
+
+                if (!res.ok) {
+                    const text = await res.text();
+                    console.log("RAW RESPONSE:", text);
+                    throw new Error(text);
+                }
+                const data = await res.json();
+
+                if (!data.success) {
+                    alert(data.message || "Order not found");
+                    return;
+                }
+
+                order = data.order;
+
+                document.getElementById("amount").value = "₹ " + (order.amount / 100).toFixed(2);
+                document.getElementById("currency").value = order.currency;
+
+                let statusInput = document.getElementById("status");
+
+                if (!statusInput) {
+                    const statusLabel = document.createElement("label");
+                    statusLabel.innerText = "Order Status";
+
+                    statusInput = document.createElement("input");
+                    statusInput.id = "status";
+                    statusInput.readOnly = true;
+
+                    document.getElementById("currency")
+                        .insertAdjacentElement("afterend", statusLabel);
+
+                    statusLabel.insertAdjacentElement("afterend", statusInput);
+                }
+
+                statusInput.value = order.status;
+
+                if (order.status === "paid") {
+                    payButton.disabled = true;
+                    alert("This order is already paid.");
+                } else {
+                    payButton.disabled = false;
+                    alert("Order loaded successfully");
+                }
+
+            } catch (err) {
+                console.error("Load order error:", err);
+                document.getElementById("response").textContent =
+                    "Error: " + err.message;
+
+                alert("Unable to load order (check console)");
+            } finally {
+                loadButton.disabled = false;
+                loadButton.innerText = "Load Order";
+            }
+        }
+
+        function payNow() {
+
+            if (!order) {
+                alert("Load order first");
+                return;
+            }
+
+            const options = {
+                key: document.getElementById("key").value,
+                amount: order.amount,
+                currency: order.currency,
+                order_id: order.id,
+                name: "Glowante",
+                description: "Salon Booking",
+
+                handler: async function (response) {
+
+                    document.getElementById("response").textContent =
+                        JSON.stringify(response, null, 4);
+
+                    try {
+                        const verify = await fetch("http://localhost:3000/razorpay/verify", {
+                            method: "POST",
+                            headers: {
+                                "Content-Type": "application/json"
+                            },
+                            body: JSON.stringify({
+                                razorpay_order_id: response.razorpay_order_id,
+                                razorpay_payment_id: response.razorpay_payment_id,
+                                razorpay_signature: response.razorpay_signature
+                            })
+                        });
+
+                        const verifyData = await verify.json();
+
+                        alert(verifyData.message || "Payment Verified");
+
+                        loadOrder();
+
+                    } catch (err) {
+                        console.error(err);
+                        alert("Verification failed");
+                    }
+                },
+
+                prefill: {
+                    name: document.getElementById("name").value,
+                    email: document.getElementById("email").value,
+                    contact: document.getElementById("contact").value
+                },
+
+                theme: {
+                    color: "#3399cc"
+                }
+            };
+
+            const rzp = new Razorpay(options);
+
+            rzp.on("payment.failed", function (response) {
+                document.getElementById("response").textContent =
+                    JSON.stringify(response.error, null, 4);
+
+                alert("Payment Failed");
+            });
+
+            rzp.open();
+        }
+
+    </script>
+
+</body>
+
+</html>

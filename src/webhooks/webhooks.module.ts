@@ -8,6 +8,7 @@ import { PurchasedDeal } from 'src/purchased-deals/entities/purchased-deal.entit
 import { PurchasedPackageService } from 'src/purchased-package-services/entities/purchased-package-service.entity';
 import { PurchasedDealService } from 'src/purchased-deal-services/entities/purchased-deal-service.entity';
 import { Appointment } from 'src/appointments/entities/appointment.entity';
+import { Payment } from 'src/razorpay/entities/razorpay.entity';
 
 @Module({
   imports: [
@@ -17,7 +18,8 @@ import { Appointment } from 'src/appointments/entities/appointment.entity';
       PurchasedPackage,
       PurchasedPackageService,
       PurchasedDealService,
-      Appointment
+      Appointment,
+      Payment,
     ]),
   ],
   controllers: [WebhookController],
