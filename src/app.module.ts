@@ -6,7 +6,7 @@ import { SalonsModule } from './salons/salons.module';
 import { BranchesModule } from './branches/branches.module';
 import { TeamMembersModule } from './team-members/team-members.module';
 import { ServicesModule } from './services/services.module';
-import { ConfigModule } from '@nestjs/config';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 import { CategoriesModule } from './categories/categories.module';
 import { SubCategoriesModule } from './sub-categories/sub-categories.module';
 import { PackagesModule } from './packages/packages.module';
@@ -34,10 +34,33 @@ import { PurchasedPackageServicesModule } from './purchased-package-services/pur
 import { PurchasedDealServicesModule } from './purchased-deal-services/purchased-deal-services.module';
 import { ReportsModule } from './reports/reports.module';
 import { RazorpayModule } from './razorpay/razorpay.module';
+import { MailerModule } from '@nestjs-modules/mailer';
+import { MailModule } from './mail/mail.module';
+import { NotificationsModule } from './firebase-web-notification/notification.module';
+
 @Module({
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
+    }),
+
+    MailerModule.forRootAsync({
+      imports: [ConfigModule],
+      inject: [ConfigService],
+      useFactory: (config: ConfigService) => ({
+        transport: {
+          host: 'smtp.gmail.com',
+          port: 587,
+          secure: false,
+          auth: {
+            user: config.get<string>('EMAIL'),
+            pass: config.get<string>('EMAIL_PASSWORD'),
+          },
+        },
+        defaults: {
+          from: config.get<string>('EMAIL'),
+        },
+      }),
     }),
     TypeOrmModule.forRoot({
       type: 'postgres',
@@ -82,6 +105,8 @@ import { RazorpayModule } from './razorpay/razorpay.module';
     PurchasedDealServicesModule,
     ReportsModule,
     RazorpayModule,
+    NotificationsModule,
+    MailModule,
   ],
   controllers: [AppController],
   providers: [AppService, NotificationGateway],

@@ -244,6 +244,19 @@
 
                 alert("Payment Failed");
             });
+            rzp.on("payment.failed", function (response) {
+
+                console.log("FULL RESPONSE");
+                console.log(response);
+
+                console.log("ERROR");
+                console.log(response.error);
+
+                document.getElementById("response").textContent =
+                    JSON.stringify(response, null, 2);
+
+                alert(JSON.stringify(response.error, null, 2));
+            });
 
             rzp.open();
         }
