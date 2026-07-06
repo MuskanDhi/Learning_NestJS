@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Alarm Notification</title>
+
+    <link rel="stylesheet" href="style.css">
+
+</head>
+
+<body>
+
+    <div class="container">
+
+        <h1>Alarm Notification System</h1>
+
+        <p>
+            Receive desktop notifications from your NestJS Cron Job.
+        </p>
+
+        <button id="allow">
+            Enable Notifications
+        </button>
+
+        <div class="card">
+
+            <h3>Notification Status</h3>
+
+            <p id="status">
+                Permission : Not Granted
+            </p>
+
+        </div>
+
+        <div class="card">
+
+            <h3>FCM Token</h3>
+
+            <textarea id="token" readonly placeholder="Token will appear here..."></textarea>
+
+            <button id="copy">
+                Copy Token
+            </button>
+
+        </div>
+
+    </div>
+
+    <script type="module" src="app.js"></script>
+
+</body>
+
+</html>

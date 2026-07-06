@@ -29,7 +29,7 @@ export class AlarmService {
         console.log(now);
 
         const token =
-            "YOUR_FCM_TOKEN";
+            "dUQVeHkrGrde8AHvcqNF6p:APA91bGTDvwrTFzbLEYSrAzX_aRCGbv7B3VTa_5Yt3AdnxwnG5PNe3JxeFMNi7PlyW_xUuyQmO-nUhxiXM_wxWra4neGeynhuHvH19qZghdqOAtXCznJTpA";
 
         await this.notificationService.send(
 

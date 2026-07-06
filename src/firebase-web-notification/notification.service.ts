@@ -49,52 +49,93 @@ export class NotificationService {
 
     //     return response;
     // }
+
+
+
+    // async send(
+    //     token: string,
+    //     title: string,
+    //     body: string,
+    // ) {
+
+    //     try {
+
+    //         const response = await admin.messaging().send({
+
+    //             token,
+
+    //             notification: {
+    //                 title,
+    //                 body,
+    //             },
+
+    //             webpush: {
+
+    //                 headers: {
+    //                     Urgency: 'high',
+    //                 },
+
+    //                 notification: {
+    //                     title,
+    //                     body,
+    //                     icon: 'https://firebase.google.com/favicon.ico',
+    //                 },
+
+    //                 fcmOptions: {
+    //                     link: 'http://127.0.0.1:5500/src/firebase-web-notification/index.html',
+    //                 },
+    //             },
+    //         });
+
+    //         console.log(`Notification Sent: ${response}`);
+
+    //         return response;
+
+    //     } catch (error) {
+
+    //         console.error(error);
+
+    //         throw error;
+
+    //     }
+
+    // }
+
+
     async send(
         token: string,
         title: string,
         body: string,
     ) {
+        const response = await admin.messaging().send({
+            token,
 
-        try {
+            notification: {
+                title,
+                body,
+            },
 
-            const response = await admin.messaging().send({
-
-                token,
+            webpush: {
+                headers: {
+                    Urgency: "high",
+                },
 
                 notification: {
                     title,
                     body,
+                    icon: "https://firebase.google.com/favicon.ico",
+                    badge: "https://firebase.google.com/favicon.ico",
+                    requireInteraction: true,
                 },
 
-                webpush: {
-
-                    headers: {
-                        Urgency: 'high',
-                    },
-
-                    notification: {
-                        title,
-                        body,
-                        icon: 'https://firebase.google.com/favicon.ico',
-                    },
-
-                    fcmOptions: {
-                        link: 'http://127.0.0.1:5500/src/firebase-web-notification/index.html',
-                    },
+                fcmOptions: {
+                    link: "http://127.0.0.1:5500/src/firebase-web-notificationss/",
                 },
-            });
+            },
+        });
 
-            console.log(`Notification Sent: ${response}`);
+        console.log("Notification Sent:", response);
 
-            return response;
-
-        } catch (error) {
-
-            console.error(error);
-
-            throw error;
-
-        }
-
+        return response;
     }
 }
