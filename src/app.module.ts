@@ -37,6 +37,7 @@ import { RazorpayModule } from './razorpay/razorpay.module';
 import { MailerModule } from '@nestjs-modules/mailer';
 import { MailModule } from './mail/mail.module';
 import { NotificationsModule } from './firebase-web-notification/notification.module';
+import { AuthsModule } from './auths/auths.module';
 
 @Module({
   imports: [
@@ -107,6 +108,7 @@ import { NotificationsModule } from './firebase-web-notification/notification.mo
     RazorpayModule,
     NotificationsModule,
     MailModule,
+    AuthsModule,
   ],
   controllers: [AppController],
   providers: [AppService, NotificationGateway],
