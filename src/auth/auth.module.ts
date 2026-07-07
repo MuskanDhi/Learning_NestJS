@@ -10,13 +10,15 @@ import { ConfigModule } from '@nestjs/config';
 import { Customer } from 'src/customers/entities/customer.entity';
 import { Registration } from 'src/customers/entities/registraion.entity';
 import { Appointment } from 'src/appointments/entities/appointment.entity';
+import { InventoryUsage } from 'src/inventory-items/entities/inventory-usage.entity';
+import { InventoryItem } from 'src/inventory-items/entities/inventory-item.entity';
 
 @Module({
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
     }),
-    TypeOrmModule.forFeature([User, Customer, Registration, Appointment]),
+    TypeOrmModule.forFeature([User, Customer, Registration, Appointment, InventoryItem, InventoryUsage]),
 
     JwtModule.register({
       secret: process.env.JWT_SECRET,

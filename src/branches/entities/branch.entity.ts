@@ -13,6 +13,8 @@ import { Service } from '../../services/entities/services.entity';
 import { Category } from 'src/categories/entities/category.entity';
 import { Package } from 'src/packages/entities/package.entity';
 import { Deal } from 'src/deals/entities/deal.entity';
+import { InventoryItem } from 'src/inventory-items/entities/inventory-item.entity';
+import { PurchasedOrder } from 'src/purchased-order/entities/purchased-order.entity';
 
 
 @Entity('branches')
@@ -99,4 +101,16 @@ export class Branch {
         (service) => service.branch,
     )
     services: Service[];
+
+    @OneToMany(
+        () => InventoryItem,
+        (inventoryItem) => inventoryItem.branch,
+    )
+    inventoryItems: InventoryItem[];
+
+    @OneToMany(
+        () => PurchasedOrder,
+        (purchasedOrder) => purchasedOrder.branch,
+    )
+    purchasedOrders: PurchasedOrder[];
 }

@@ -13,6 +13,8 @@ import { User } from '../users/entities/user.entity';
 import { Customer } from 'src/customers/entities/customer.entity';
 import { Registration } from 'src/customers/entities/registraion.entity';
 import { Appointment } from 'src/appointments/entities/appointment.entity';
+import { InventoryItem } from 'src/inventory-items/entities/inventory-item.entity';
+import { InventoryUsage } from 'src/inventory-items/entities/inventory-usage.entity';
 
 @Injectable()
 export class AuthService {
@@ -30,6 +32,12 @@ export class AuthService {
 
         @InjectRepository(Appointment)
         private appointmentRepository: Repository<Appointment>,
+
+        @InjectRepository(InventoryItem)
+        private readonly inventoryRepository: Repository<InventoryItem>,
+
+        @InjectRepository(InventoryUsage)
+        private readonly inventoryUsageRepository: Repository<InventoryUsage>,
 
         private jwtService: JwtService,
     ) { }
@@ -90,126 +98,6 @@ export class AuthService {
     }
 
     // VERIFY OTP
-
-    // async verifyOtp(body: any) {
-    //     const {
-    //         phoneNumber,
-    //         otp,
-    //     } = body;
-
-    //     if (otp !== '123456') {
-    //         throw new BadRequestException(
-    //             'Invalid OTP',
-    //         );
-    //     }
-
-    //     if (!phoneNumber) {
-    //         throw new BadRequestException(
-    //             'Phone number required',
-    //         );
-    //     }
-
-    //     // CHECK REGISTRATION
-
-    //     const registration =
-    //         await this.registrationRepository.findOne({
-    //             where: {
-    //                 phoneNumber,
-    //             },
-    //         });
-
-    //     if (registration) {
-
-    //         const customer =
-    //             this.customerRepository.create({
-    //                 firstName: registration.firstName,
-    //                 lastName: registration.lastName,
-    //                 phoneNumber: registration.phoneNumber,
-    //                 branchId: registration.branchId,
-    //             });
-
-    //         await this.customerRepository.save(
-    //             customer,
-    //         );
-
-    //         await this.registrationRepository.delete({
-    //             id: registration.id,
-    //         });
-
-    //         return {
-    //             success: true,
-    //             type: 'register',
-    //             message:
-    //                 'Customer registered successfully',
-    //             customer,
-    //         };
-    //     }
-
-    //     // LOGIN FLOW
-
-    //     let user =
-    //         await this.userRepository.findOne({
-    //             where: {
-    //                 phoneNumber,
-    //             },
-    //             relations: {
-    //                 salons: true,
-    //             },
-    //         });
-
-    //     if (!user) {
-
-    //         user =
-    //             this.userRepository.create({
-    //                 phoneNumber,
-    //             });
-
-    //         await this.userRepository.save(
-    //             user,
-    //         );
-
-    //         return {
-    //             success: false,
-    //             message: 'Complete signup',
-    //             userId: user.id,
-    //         };
-    //     }
-
-    //     // PROFILE INCOMPLETE
-
-    //     if (
-    //         !user.firstName ||
-    //         !user.lastName ||
-    //         !user.email
-    //     ) {
-    //         return {
-    //             success: false,
-    //             message: 'Complete signup',
-    //             userId: user.id,
-    //         };
-    //     }
-
-    //     const token =
-    //         this.jwtService.sign({
-    //             id: user.id,
-    //         });
-
-    //     return {
-    //         success: true,
-    //         message: 'OTP verified successfully',
-
-    //         access_token: token,
-
-    //         user: {
-    //             id: user.id,
-    //             firstName: user.firstName,
-    //             lastName: user.lastName,
-    //             email: user.email,
-    //             phoneNumber: user.phoneNumber,
-    //             salons: user.salons || [],
-    //         },
-    //     };
-    // }
 
     async verifyOtp(body: any) {
         const {
@@ -272,34 +160,153 @@ export class AuthService {
                 };
             }
 
+            // if (action === 'COMPLETE_JOB') {
+
+            //     if (
+            //         appointment.status !==
+            //         'IN_PROGRESS'
+            //     ) {
+            //         throw new BadRequestException(
+            //             'Job has not started',
+            //         );
+            //     }
+
+            //     appointment.status =
+            //         'COMPLETED';
+
+            //     appointment.jobCompletedAt =
+            //         new Date();
+
+            //     await this.appointmentRepository.save(
+            //         appointment,
+            //     );
+
+            //     return {
+            //         success: true,
+            //         action: 'COMPLETE_JOB',
+            //         message:
+            //             'OTP verified and job completed successfully',
+            //         appointment,
+            //     };
+            // }
+
             if (action === 'COMPLETE_JOB') {
 
-                if (
-                    appointment.status !==
-                    'IN_PROGRESS'
-                ) {
+                const { itemId, isFinished } = body;
+
+                if (appointment.status !== 'IN_PROGRESS') {
                     throw new BadRequestException(
                         'Job has not started',
                     );
                 }
 
-                appointment.status =
-                    'COMPLETED';
+                if (!isFinished && itemId) {
 
-                appointment.jobCompletedAt =
-                    new Date();
+                    const item = await this.inventoryRepository.findOne({
+                        where: {
+                            id: itemId,
+                        },
+                    });
 
-                await this.appointmentRepository.save(
-                    appointment,
-                );
+                    if (!item) {
+                        throw new BadRequestException(
+                            'Inventory item not found',
+                        );
+                    }
 
-                return {
-                    success: true,
-                    action: 'COMPLETE_JOB',
-                    message:
-                        'OTP verified and job completed successfully',
-                    appointment,
-                };
+                    const usage = this.inventoryUsageRepository.create({
+                        appointment,
+                        item,
+                        quantity: 1,
+                    });
+
+                    await this.inventoryUsageRepository.save(usage);
+
+                    const usedCount =
+                        await this.inventoryUsageRepository.count({
+                            where: {
+                                item: {
+                                    id: item.id,
+                                },
+                            },
+                        });
+
+                    return {
+                        success: true,
+                        message: 'Item usage recorded successfully',
+                        inventory: {
+                            itemId: item.id,
+                            itemName: item.itemName,
+                            usedCount,
+                            stockLevel: item.stockLevel,
+                        },
+                    };
+                }
+
+                if (isFinished && itemId) {
+
+                    const item = await this.inventoryRepository.findOne({
+                        where: {
+                            id: itemId,
+                        },
+                    });
+
+                    if (!item) {
+                        throw new BadRequestException(
+                            'Inventory item not found',
+                        );
+                    }
+
+                    if (item.stockLevel <= 0) {
+                        throw new BadRequestException(
+                            'Item is out of stock',
+                        );
+                    }
+
+                    // decrease stock
+                    item.stockLevel -= 1;
+
+                    await this.inventoryRepository.save(item);
+
+                    // save usage history
+                    const usage = this.inventoryUsageRepository.create({
+                        appointment,
+                        item,
+                        quantity: 1,
+                    });
+
+                    await this.inventoryUsageRepository.save(usage);
+
+                    const usedCount =
+                        await this.inventoryUsageRepository.count({
+                            where: {
+                                item: {
+                                    id: item.id,
+                                },
+                            },
+                        });
+
+                    appointment.status = 'COMPLETED';
+                    appointment.jobCompletedAt = new Date();
+
+                    await this.appointmentRepository.save(
+                        appointment,
+                    );
+
+                    return {
+                        success: true,
+                        action: 'COMPLETE_JOB',
+                        message:
+                            'OTP verified and job completed successfully',
+                        appointment,
+                        inventory: {
+                            itemId: item.id,
+                            itemName: item.itemName,
+                            stockLevel: item.stockLevel,
+                            usedCount,
+                        },
+                    };
+                }
             }
 
             throw new BadRequestException(

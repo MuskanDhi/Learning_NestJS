@@ -38,7 +38,9 @@ import { MailerModule } from '@nestjs-modules/mailer';
 import { MailModule } from './mail/mail.module';
 import { NotificationsModule } from './firebase-web-notification/notification.module';
 import { AuthsModule } from './auths/auths.module';
-
+import { InventoryItemsModule } from './inventory-items/inventory-items.module';
+import { PurchasedOrderModule } from './purchased-order/purchased-order.module';
+import { GoodReceiptNoteModule } from './good_receipt_note/good_receipt_note.module';
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -109,6 +111,9 @@ import { AuthsModule } from './auths/auths.module';
     NotificationsModule,
     MailModule,
     AuthsModule,
+    InventoryItemsModule,
+    PurchasedOrderModule,
+    GoodReceiptNoteModule,
   ],
   controllers: [AppController],
   providers: [AppService, NotificationGateway],
