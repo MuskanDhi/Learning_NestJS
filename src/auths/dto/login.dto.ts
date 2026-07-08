@@ -5,4 +5,6 @@ export class LoginDto {
     @IsEmail()
     email: string;
 
+    turnstileToken: string;
+
 }

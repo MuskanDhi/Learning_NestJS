@@ -4,6 +4,7 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
     <title>Glowante Authentication</title>
 
     <link rel="stylesheet" href="style.css">
@@ -21,24 +22,37 @@
                 Email OTP Authentication
             </p>
 
-            <div class="button-group">
+            <div class="cf-turnstile" data-sitekey="0x4AAAAAADx3RKMTe18vRgHG" data-callback="turnstileSuccess"></div>
+        </div>
 
-                <a href="signup.html">
+        <br>
+
+        <div class="button-group">
+
+            <!-- <a href="signup.html">
                     <button>Create Account</button>
                 </a>
 
                 <a href="login.html">
                     <button class="secondary">
                         Login
-                    </button>
-                </a>
+                    </button> -->
 
-            </div>
+            <button id="signupBtn" disabled>
+                Create Account
+            </button>
+
+            <button id="loginBtn" class="secondary" disabled>
+                Login
+            </button>
+            </a>
 
         </div>
 
     </div>
 
+    </div>
+    <script src="index.js"></script>
 </body>
 
 </html>

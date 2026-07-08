@@ -6,6 +6,7 @@ import { SignupDto } from './dto/signup.dto';
 import { MailService } from '../mail/mail.service';
 import { VerifyOtpDto } from './dto/verify-otp.dto';
 import { LoginDto } from './dto/login.dto';
+import axios from 'axios';
 
 @Injectable()
 export class AuthsService {
@@ -15,7 +16,29 @@ export class AuthsService {
         private readonly mailService: MailService,
     ) { }
     async signup(signupDto: SignupDto) {
-        const { name, email } = signupDto;
+        const { name, email, turnstileToken } = signupDto;
+
+        // Verify Cloudflare Turnstile
+        const verify = await axios.post(
+            'https://challenges.cloudflare.com/turnstile/v0/siteverify',
+
+            new URLSearchParams({
+                secret: process.env.TURNSTILE_SECRET_KEY!,
+                response: turnstileToken,
+            }),
+
+            {
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+            },
+        );
+
+        if (!verify.data.success) {
+            throw new BadRequestException(
+                'Robot verification failed',
+            );
+        }
 
         const existingUser = await this.userRepository.findOne({
             where: { email },
@@ -43,6 +66,7 @@ export class AuthsService {
         await this.mailService.sendOtp(email, otp);
 
         return {
+            success: true,
             message: 'OTP sent successfully',
         };
     }
@@ -81,7 +105,29 @@ export class AuthsService {
 
     async login(loginDto: LoginDto) {
 
-        const { email } = loginDto;
+        const { email, turnstileToken } = loginDto;
+
+        // Verify Cloudflare Turnstile
+        const verify = await axios.post(
+            "https://challenges.cloudflare.com/turnstile/v0/siteverify",
+
+            new URLSearchParams({
+                secret: process.env.TURNSTILE_SECRET_KEY!,
+                response: turnstileToken,
+            }),
+
+            {
+                headers: {
+                    "Content-Type": "application/x-www-form-urlencoded",
+                },
+            },
+        );
+
+        if (!verify.data.success) {
+            throw new BadRequestException(
+                "Robot verification failed",
+            );
+        }
 
         const user = await this.userRepository.findOne({
             where: { email },

@@ -6,6 +6,20 @@ form.addEventListener("submit", async (e) => {
 
     const email = document.getElementById("email").value;
 
+    const turnstileToken = localStorage.getItem("turnstileToken");
+
+
+    if (!turnstileToken) {
+        alert("Please complete 'I'm not a robot' verification first.");
+        window.location.href = "index.html";
+        return;
+    }
+
+    if (!email) {
+        alert("Enter your email");
+        return;
+    }
+
     try {
 
         const response = await fetch(
@@ -17,13 +31,17 @@ form.addEventListener("submit", async (e) => {
                 },
                 body: JSON.stringify({
                     email,
+                    turnstileToken,
                 }),
             }
         );
 
         const data = await response.json();
 
-        alert(data.message);
+        if (!response.ok) {
+            alert(data.message || "Login failed");
+            return;
+        }
 
         if (data.success) {
 
@@ -33,11 +51,16 @@ form.addEventListener("submit", async (e) => {
 
             window.location.href = "verify-otp.html";
 
+        } else {
+
+            alert(data.message);
+
         }
 
     } catch (err) {
 
         console.error(err);
+        alert("Something went wrong.");
 
     }
 

@@ -5,6 +5,15 @@ btn.onclick = async () => {
     const name = document.getElementById("name").value;
     const email = document.getElementById("email").value;
 
+    // Get Turnstile token from localStorage
+    const turnstileToken = localStorage.getItem("turnstileToken");
+
+    if (!turnstileToken) {
+        alert("Please complete 'I'm not a robot' verification first.");
+        window.location.href = "index.html";
+        return;
+    }
+
     if (!name || !email) {
         alert("Enter all fields");
         return;
@@ -22,12 +31,18 @@ btn.onclick = async () => {
 
             body: JSON.stringify({
                 name,
-                email
-            })
+                email,
+                turnstileToken,
+            }),
 
         });
 
         const data = await res.json();
+
+        if (!res.ok) {
+            alert(data.message || "Signup failed");
+            return;
+        }
 
         alert(data.message);
 
@@ -38,6 +53,8 @@ btn.onclick = async () => {
     } catch (err) {
 
         console.log(err);
+
+        alert("Something went wrong");
 
     }
 
