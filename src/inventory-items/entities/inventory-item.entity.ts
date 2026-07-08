@@ -38,6 +38,12 @@ export class InventoryItem {
     )
     branch: Branch;
 
+    @Column({
+        type: 'int',
+        default: 0,
+    })
+    usedCount: number;
+
     @CreateDateColumn()
     createdAt: Date;
 

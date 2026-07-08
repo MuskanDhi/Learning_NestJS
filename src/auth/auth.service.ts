@@ -160,36 +160,6 @@ export class AuthService {
                 };
             }
 
-            // if (action === 'COMPLETE_JOB') {
-
-            //     if (
-            //         appointment.status !==
-            //         'IN_PROGRESS'
-            //     ) {
-            //         throw new BadRequestException(
-            //             'Job has not started',
-            //         );
-            //     }
-
-            //     appointment.status =
-            //         'COMPLETED';
-
-            //     appointment.jobCompletedAt =
-            //         new Date();
-
-            //     await this.appointmentRepository.save(
-            //         appointment,
-            //     );
-
-            //     return {
-            //         success: true,
-            //         action: 'COMPLETE_JOB',
-            //         message:
-            //             'OTP verified and job completed successfully',
-            //         appointment,
-            //     };
-            // }
-
             if (action === 'COMPLETE_JOB') {
 
                 const { itemId, isFinished } = body;
@@ -200,7 +170,7 @@ export class AuthService {
                     );
                 }
 
-                if (!isFinished && itemId) {
+                if (itemId) {
 
                     const item = await this.inventoryRepository.findOne({
                         where: {
@@ -214,78 +184,58 @@ export class AuthService {
                         );
                     }
 
-                    const usage = this.inventoryUsageRepository.create({
-                        appointment,
-                        item,
-                        quantity: 1,
-                    });
+                    // ===============================
+                    // Product NOT Finished
+                    // ===============================
+                    if (!isFinished) {
 
-                    await this.inventoryUsageRepository.save(usage);
+                        // Store usage history
+                        const usage =
+                            this.inventoryUsageRepository.create({
+                                appointment,
+                                item,
+                                quantity: 1,
+                            });
 
-                    const usedCount =
-                        await this.inventoryUsageRepository.count({
-                            where: {
-                                item: {
-                                    id: item.id,
-                                },
-                            },
-                        });
-
-                    return {
-                        success: true,
-                        message: 'Item usage recorded successfully',
-                        inventory: {
-                            itemId: item.id,
-                            itemName: item.itemName,
-                            usedCount,
-                            stockLevel: item.stockLevel,
-                        },
-                    };
-                }
-
-                if (isFinished && itemId) {
-
-                    const item = await this.inventoryRepository.findOne({
-                        where: {
-                            id: itemId,
-                        },
-                    });
-
-                    if (!item) {
-                        throw new BadRequestException(
-                            'Inventory item not found',
+                        await this.inventoryUsageRepository.save(
+                            usage,
                         );
+
+                        // Increase Used Count
+                        item.usedCount += 1;
+
+                        await this.inventoryRepository.save(item);
                     }
 
-                    if (item.stockLevel <= 0) {
-                        throw new BadRequestException(
-                            'Item is out of stock',
-                        );
-                    }
+                    // ===============================
+                    // Product Finished
+                    // ===============================
+                    else {
 
-                    // decrease stock
-                    item.stockLevel -= 1;
+                        if (item.stockLevel <= 0) {
+                            throw new BadRequestException(
+                                'Item is out of stock',
+                            );
+                        }
 
-                    await this.inventoryRepository.save(item);
-
-                    // save usage history
-                    const usage = this.inventoryUsageRepository.create({
-                        appointment,
-                        item,
-                        quantity: 1,
-                    });
-
-                    await this.inventoryUsageRepository.save(usage);
-
-                    const usedCount =
-                        await this.inventoryUsageRepository.count({
-                            where: {
-                                item: {
-                                    id: item.id,
-                                },
-                            },
+                        // Save usage history
+                        const usage = this.inventoryUsageRepository.create({
+                            appointment,
+                            item,
+                            quantity: 1,
                         });
 
+                        await this.inventoryUsageRepository.save(usage);
+
+                        item.usedCount = 0;
+
+                        // Decrease Stock
+                        item.stockLevel -= 1;
+
+                        await this.inventoryRepository.save(item);
+                    }
+
+                    // Complete Appointment
                     appointment.status = 'COMPLETED';
                     appointment.jobCompletedAt = new Date();
 
@@ -302,12 +252,30 @@ export class AuthService {
                         inventory: {
                             itemId: item.id,
                             itemName: item.itemName,
+                            usedCount: item.usedCount,
                             stockLevel: item.stockLevel,
-                            usedCount,
                         },
                     };
                 }
+
+                // No Inventory Item
+                appointment.status = 'COMPLETED';
+                appointment.jobCompletedAt = new Date();
+
+                await this.appointmentRepository.save(
+                    appointment,
+                );
+
+                return {
+                    success: true,
+                    action: 'COMPLETE_JOB',
+                    message:
+                        'OTP verified and job completed successfully',
+                    appointment,
+                };
             }
+
+
 
             throw new BadRequestException(
                 'Invalid action',
