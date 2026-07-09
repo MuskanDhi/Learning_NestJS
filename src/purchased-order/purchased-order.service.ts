@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
@@ -10,6 +11,7 @@ import { Branch } from 'src/branches/entities/branch.entity';
 import { CreatePurchasedOrderDto } from './dto/create-purchased-order.dto';
 import { InventoryItem } from 'src/inventory-items/entities/inventory-item.entity';
 import { PurchasedOrder } from './entities/purchased-order.entity';
+import { Vendor } from 'src/vendors/entities/vendor.entity';
 
 @Injectable()
 export class PurchasedOrderService {
@@ -22,6 +24,9 @@ export class PurchasedOrderService {
 
     @InjectRepository(Branch)
     private readonly branchRepo: Repository<Branch>,
+
+    @InjectRepository(Vendor)
+    private readonly vendorRepo: Repository<Vendor>,
   ) { }
 
   async create(
@@ -52,6 +57,20 @@ export class PurchasedOrderService {
       );
     }
 
+    if (!dto.vendorId) {
+      throw new BadRequestException('vendorId is required');
+    }
+
+    const vendor = await this.vendorRepo.findOne({
+      where: {
+        id: dto.vendorId,
+      },
+    });
+
+    if (!vendor) {
+      throw new BadRequestException('Vendor not found');
+    }
+
     const purchasedOrder =
       this.purchasedOrderRepo.create({
         createdBy: dto.createdBy,
@@ -60,6 +79,7 @@ export class PurchasedOrderService {
         item,
         itemName: item.itemName,
         branch,
+        vendor,
       });
 
     await this.purchasedOrderRepo.save(

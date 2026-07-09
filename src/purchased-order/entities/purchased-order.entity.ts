@@ -8,6 +8,7 @@ import {
 
 import { Branch } from 'src/branches/entities/branch.entity';
 import { InventoryItem } from 'src/inventory-items/entities/inventory-item.entity';
+import { Vendor } from 'src/vendors/entities/vendor.entity';
 
 @Entity('purchased_orders')
 export class PurchasedOrder {
@@ -37,6 +38,11 @@ export class PurchasedOrder {
         default: 'ORDERED',
     })
     status: string;
+
+    @ManyToOne(() => Vendor, (vendor) => vendor.purchasedOrders, {
+        onDelete: 'CASCADE',
+    })
+    vendor: Vendor;
 
     @CreateDateColumn()
     createdAt: Date;

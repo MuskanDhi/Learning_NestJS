@@ -41,6 +41,7 @@ import { AuthsModule } from './auths/auths.module';
 import { InventoryItemsModule } from './inventory-items/inventory-items.module';
 import { PurchasedOrderModule } from './purchased-order/purchased-order.module';
 import { GoodReceiptNoteModule } from './good_receipt_note/good_receipt_note.module';
+import { VendorsModule } from './vendors/vendors.module';
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -114,6 +115,7 @@ import { GoodReceiptNoteModule } from './good_receipt_note/good_receipt_note.mod
     InventoryItemsModule,
     PurchasedOrderModule,
     GoodReceiptNoteModule,
+    VendorsModule,
   ],
   controllers: [AppController],
   providers: [AppService, NotificationGateway],

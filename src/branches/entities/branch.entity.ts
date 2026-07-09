@@ -15,6 +15,7 @@ import { Package } from 'src/packages/entities/package.entity';
 import { Deal } from 'src/deals/entities/deal.entity';
 import { InventoryItem } from 'src/inventory-items/entities/inventory-item.entity';
 import { PurchasedOrder } from 'src/purchased-order/entities/purchased-order.entity';
+import { Vendor } from 'src/vendors/entities/vendor.entity';
 
 
 @Entity('branches')
@@ -107,6 +108,12 @@ export class Branch {
         (inventoryItem) => inventoryItem.branch,
     )
     inventoryItems: InventoryItem[];
+
+    @OneToMany(
+        () => Vendor,
+        (vendor) => vendor.branch,
+    )
+    vendors: Vendor[];
 
     @OneToMany(
         () => PurchasedOrder,
