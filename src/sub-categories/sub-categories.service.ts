@@ -50,6 +50,12 @@ export class SubCategoriesService {
             );
         }
 
+        if (!dto || !dto.name) {
+            throw new BadRequestException(
+                'SubCategory name is required.',
+            );
+        }
+
         const existingSubCategory =
             await this.subcategoryRepo.findOne({
                 where: {
@@ -125,46 +131,48 @@ export class SubCategoriesService {
     //     };
     // }
 
-    async findByCategory(
-        categoryId: string,
-    ) {
-        const category =
-            await this.categoryRepo.findOne({
-                where: {
-                    id: categoryId,
-                },
-                relations: {
-                    branch: {
-                        salon: true,
-                    },
-                    subCategories: {
-                        services: true,
-                    },
-                },
-            });
 
-        if (!category) {
-            throw new NotFoundException(
-                'Category not found',
-            );
-        }
 
-        return {
-            salon: {
-                ...category.branch.salon,
-                branches: {
-                    ...category.branch,
-                    salon: undefined,
-                    categories: {
-                        id: category.id,
-                        name: category.name,
-                        subCategories:
-                            category.subCategories,
-                    },
-                },
-            },
-        };
-    }
+    // async findByCategory(
+    //     categoryId: string,
+    // ) {
+    //     const category =
+    //         await this.categoryRepo.findOne({
+    //             where: {
+    //                 id: categoryId,
+    //             },
+    //             relations: {
+    //                 branch: {
+    //                     salon: true,
+    //                 },
+    //                 subCategories: {
+    //                     services: true,
+    //                 },
+    //             },
+    //         });
+
+    //     if (!category) {
+    //         throw new NotFoundException(
+    //             'Category not found',
+    //         );
+    //     }
+
+    //     return {
+    //         salon: {
+    //             ...category.branch.salon,
+    //             branches: {
+    //                 ...category.branch,
+    //                 salon: undefined,
+    //                 categories: {
+    //                     id: category.id,
+    //                     name: category.name,
+    //                     subCategories:
+    //                         category.subCategories,
+    //                 },
+    //             },
+    //         },
+    //     };
+    // }
 
     async update(
         subcategoryId: string,
@@ -212,7 +220,7 @@ export class SubCategoriesService {
         return {
             message:
                 'SubCategory updated successfully',
-            category: updatedSubCategory,
+            SubCategory: updatedSubCategory,
         };
     }
 
@@ -236,13 +244,13 @@ export class SubCategoriesService {
                 },
             });
 
-        if(!subcategory){
+        if (!subcategory) {
             throw new NotFoundException(
                 'subcategory not found',
             );
         }
 
-        if(subcategory.category.branch.salon.user.id !== userId){
+        if (subcategory.category.branch.salon.user.id !== userId) {
             throw new BadRequestException(
                 'This subcategory does not belong to you',
             );

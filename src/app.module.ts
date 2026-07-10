@@ -42,7 +42,8 @@ import { InventoryItemsModule } from './inventory-items/inventory-items.module';
 import { PurchasedOrderModule } from './purchased-order/purchased-order.module';
 import { GoodReceiptNoteModule } from './good_receipt_note/good_receipt_note.module';
 import { VendorsModule } from './vendors/vendors.module';
-@Module({
+import { TeamMemberAttendenceModule } from './team-member-attendence/team-member-attendence.module';
+ @Module({
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
@@ -116,6 +117,7 @@ import { VendorsModule } from './vendors/vendors.module';
     PurchasedOrderModule,
     GoodReceiptNoteModule,
     VendorsModule,
+    TeamMemberAttendenceModule,
   ],
   controllers: [AppController],
   providers: [AppService, NotificationGateway],

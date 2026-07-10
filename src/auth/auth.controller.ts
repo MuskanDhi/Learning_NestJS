@@ -1,5 +1,6 @@
 import { Body, Controller, Param, Patch, Post } from '@nestjs/common';
 import { AuthService } from './auth.service';
+import { LoginDto } from './dto/login.dto';
 
 @Controller('auth')
 export class AuthController {
@@ -9,7 +10,7 @@ export class AuthController {
 
   @Post('login')
   login(
-    @Body() body: any,
+    @Body() body: LoginDto,
   ) {
     console.log('LOGIN API HIT');
     return this.authService.login(body);

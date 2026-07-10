@@ -45,6 +45,12 @@ export class CategoriesService {
             );
         }
 
+        if (!dto || !dto.name) {
+            throw new BadRequestException(
+                'Category name is required.',
+            );
+        }
+
         const existingCategory =
             await this.categoryRepo.findOne({
                 where: {
@@ -89,41 +95,41 @@ export class CategoriesService {
         };
     }
 
-    async findByBranch(
-        branchId: string,
-    ) {
-        const branch =
-            await this.branchRepo.findOne({
-                where: {
-                    id: branchId,
-                },
-                relations: {
-                    salon: true,
-                    categories: {
-                        subCategories: {
-                            services: true,
-                        },
-                    },
-                },
-            });
+    // async findByBranch(
+    //     branchId: string,
+    // ) {
+    //     const branch =
+    //         await this.branchRepo.findOne({
+    //             where: {
+    //                 id: branchId,
+    //             },
+    //             relations: {
+    //                 salon: true,
+    //                 categories: {
+    //                     subCategories: {
+    //                         services: true,
+    //                     },
+    //                 },
+    //             },
+    //         });
 
-        if (!branch) {
-            throw new NotFoundException(
-                'Branch not found',
-            );
-        }
+    //     if (!branch) {
+    //         throw new NotFoundException(
+    //             'Branch not found',
+    //         );
+    //     }
 
-        return {
-            salon: {
-                id: branch.salon.id,
-                name: branch.salon.name,
-                branches: {
-                    ...branch,
-                    salon: undefined,
-                },
-            },
-        };
-    }
+    //     return {
+    //         salon: {
+    //             id: branch.salon.id,
+    //             name: branch.salon.name,
+    //             branches: {
+    //                 ...branch,
+    //                 salon: undefined,
+    //             },
+    //         },
+    //     };
+    // }
 
     // UPDATE CATEGORY
     async update(

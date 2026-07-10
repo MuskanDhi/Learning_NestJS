@@ -375,180 +375,84 @@ export class TeamMembersService {
         }
     }
 
-    // async getAvailableSlots(
-    //     teamMemberId: string,
-    //     date: string,
-    // ) {
-    //     const teamMember =
-    //         await this.teamMemberRepo.findOne({
-    //             where: {
-    //                 id: teamMemberId,
-    //             },
-    //         });
+    async checkIn(
+        teamMemberId: string,
+        branchId: string,
+    ) {
+        const teamMember = await this.teamMemberRepo.findOne({
+            where: {
+                id: teamMemberId,
+                branch: {
+                    id: branchId,
+                },
+            },
+            relations: {
+                branch: true,
+            },
+        });
 
-    //     if (!teamMember) {
-    //         throw new NotFoundException(
-    //             'Team member not found',
-    //         );
-    //     }
+        if (!teamMember) {
+            throw new NotFoundException(
+                'Team member not found',
+            );
+        }
 
-    //     const selectedDate = new Date(date);
+        if (teamMember.isCheckedIn) {
+            throw new BadRequestException(
+                'Team member is already checked in',
+            );
+        }
 
-    //     const dayName =
-    //         selectedDate.toLocaleDateString(
-    //             'en-US',
-    //             {
-    //                 weekday: 'long',
-    //             },
-    //         );
+        teamMember.isCheckedIn = true;
+        teamMember.checkInTime = new Date();
+        teamMember.checkOutTime = null;
 
-    //     const schedules =
-    //         await this.teamMemberScheduleRepo.find({
-    //             where: {
-    //                 teamMember: {
-    //                     id: teamMemberId,
-    //                 },
-    //                 day: dayName,
-    //             },
-    //         });
+        await this.teamMemberRepo.save(teamMember);
 
-    //     if (!schedules.length) {
-    //         throw new BadRequestException(
-    //             `${dayName} schedule not found`,
-    //         );
-    //     }
+        return {
+            message: 'Check-in successful',
+            checkInTime: teamMember.checkInTime,
+        };
+    }
 
-    //     if (schedules.every(slot => slot.isOff)) {
-    //         throw new BadRequestException(
-    //             `${dayName} is off day`,
-    //         );
-    //     }
+    async checkOut(
+        teamMemberId: string,
+        branchId: string,
+    ) {
+        const teamMember = await this.teamMemberRepo.findOne({
+            where: {
+                id: teamMemberId,
+                branch: {
+                    id: branchId,
+                },
+            },
+            relations: {
+                branch: true,
+            },
+        });
 
-    //     // Slots currently held in cart
+        if (!teamMember) {
+            throw new NotFoundException(
+                'Team member not found',
+            );
+        }
 
-    //     const reservedCartSlots =
-    //         await this.cartRepo.find({
-    //             where: [
-    //                 {
-    //                     appointmentDate: date,
-    //                     slotStatus: 'HOLD',
-    //                     teamMember: {
-    //                         id: teamMemberId,
-    //                     },
-    //                 },
-    //                 {
-    //                     appointmentDate: date,
-    //                     slotStatus: 'RESERVED',
-    //                     teamMember: {
-    //                         id: teamMemberId,
-    //                     },
-    //                 },
-    //             ],
-    //         });
+        if (!teamMember.isCheckedIn) {
+            throw new BadRequestException(
+                'Team member is not checked in',
+            );
+        }
 
-    //     // Already booked appointments
-    //     const bookedAppointments =
-    //         await this.appointmentRepository.find({
-    //             where: {
-    //                 appointmentDate: date,
-    //                 teamMember: {
-    //                     id: teamMemberId,
-    //                 },
-    //             },
-    //             relations: {
-    //                 teamMember: true,
-    //             },
-    //         });
+        teamMember.isCheckedIn = false;
+        teamMember.checkOutTime = new Date();
 
-    //     const unavailableSlots = [
-    //         ...reservedCartSlots.map(
-    //             cart => cart.startTime,
-    //         ),
-    //         ...bookedAppointments.map(
-    //             appointment =>
-    //                 appointment.appointmentStartTime,
-    //         ),
-    //     ];
+        await this.teamMemberRepo.save(teamMember);
 
-    //     const availableSlots: {
-    //         startTime: string;
-    //         endTime: string;
-    //     }[] = [];
-
-    //     const now = new Date();
-
-    //     const activeHolds = reservedCartSlots.filter(
-    //         slot =>
-    //             !slot.slotExpiresAt ||
-    //             slot.slotExpiresAt > now,
-    //     );
-
-    //     for (const schedule of schedules) {
-    //         if (schedule.isOff) {
-    //             continue;
-    //         }
-
-    //         const isToday =
-    //             selectedDate.toDateString() ===
-    //             now.toDateString();
-
-    //         if (isToday) {
-    //             const [time, modifier] =
-    //                 schedule.startTime.split(' ');
-
-    //             let [hours, minutes] =
-    //                 time.split(':').map(Number);
-
-    //             if (
-    //                 modifier === 'PM' &&
-    //                 hours !== 12
-    //             ) {
-    //                 hours += 12;
-    //             }
-
-    //             if (
-    //                 modifier === 'AM' &&
-    //                 hours === 12
-    //             ) {
-    //                 hours = 0;
-    //             }
-
-    //             const slotTime = new Date();
-
-    //             slotTime.setHours(
-    //                 hours,
-    //                 minutes,
-    //                 0,
-    //                 0,
-    //             );
-
-    //             if (slotTime <= now) {
-    //                 continue;
-    //             }
-    //         }
-
-    //         // Hide reserved or booked slots
-    //         if (
-    //             unavailableSlots.includes(
-    //                 schedule.startTime,
-    //             )
-    //         ) {
-    //             continue;
-    //         }
-
-    //         availableSlots.push({
-    //             startTime: schedule.startTime,
-    //             endTime: schedule.endTime,
-    //         });
-    //     }
-
-    //     return {
-    //         teamMemberId,
-    //         date,
-    //         day: dayName,
-    //         availableSlots,
-    //     };
-    // }
+        return {
+            message: 'Check-out successful',
+            checkOutTime: teamMember.checkOutTime,
+        };
+    }
 
     async getAvailableSlots(
         teamMemberId: string,

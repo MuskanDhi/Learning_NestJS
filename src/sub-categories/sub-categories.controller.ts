@@ -3,7 +3,7 @@ import { CreateSubCategoryDto } from './dto/create-sub-category.dto';
 import { SubCategoriesService } from './sub-categories.service';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 
-@Controller('sub-categories')
+@Controller('branch/:branchId')
 export class SubCategoriesController {
 
     constructor(
@@ -11,7 +11,7 @@ export class SubCategoriesController {
     ) { }
 
     @UseGuards(JwtAuthGuard)
-    @Post(':categoryId')
+    @Post('category/:categoryId/sub-category/add')
     create(
         @Param('categoryId') categoryId: string,
         @Body() dto: CreateSubCategoryDto,
@@ -31,18 +31,18 @@ export class SubCategoriesController {
     //     );
     // }
 
-    @UseGuards(JwtAuthGuard)
-    @Get(':categoryId')
-    findByCategory(
-        @Param('categoryId') categoryId: string,
-    ) {
-        return this.subcategoriesService.findByCategory(
-            categoryId
-        )
-    }
+    // @UseGuards(JwtAuthGuard)
+    // @Get(':categoryId')
+    // findByCategory(
+    //     @Param('categoryId') categoryId: string,
+    // ) {
+    //     return this.subcategoriesService.findByCategory(
+    //         categoryId
+    //     )
+    // }
 
     @UseGuards(JwtAuthGuard)
-    @Patch(':id')
+    @Patch('category/:categoryId/sub-category/:id')
     update(
         @Param('id') id: string,
         @Body() body,

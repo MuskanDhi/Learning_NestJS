@@ -15,6 +15,7 @@ import { Registration } from 'src/customers/entities/registraion.entity';
 import { Appointment } from 'src/appointments/entities/appointment.entity';
 import { InventoryItem } from 'src/inventory-items/entities/inventory-item.entity';
 import { InventoryUsage } from 'src/inventory-items/entities/inventory-usage.entity';
+import { LoginDto } from './dto/login.dto';
 
 @Injectable()
 export class AuthService {
@@ -44,7 +45,7 @@ export class AuthService {
 
     // SEND OTP
 
-    async login(body: any) {
+    async login(body: LoginDto) {
 
         const { phoneNumber } = body;
 

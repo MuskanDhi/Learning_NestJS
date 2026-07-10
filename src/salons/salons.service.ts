@@ -1,4 +1,5 @@
 import {
+    BadRequestException,
     Injectable,
     NotFoundException,
 } from '@nestjs/common';
@@ -50,6 +51,119 @@ export class SalonsService {
             throw new NotFoundException(
                 'User not found',
             );
+        }
+
+        if (!dto.name) {
+            throw new BadRequestException(
+                'Salon name is required',
+            );
+        }
+
+        if (!dto.openingTime) {
+            throw new BadRequestException(
+                'Opening time is required',
+            );
+        }
+
+        if (!dto.closingTime) {
+            throw new BadRequestException(
+                'Closing time is required',
+            );
+        }
+
+        if (!dto.phoneNumber) {
+            throw new BadRequestException(
+                'Phone number is required',
+            );
+        }
+
+        if (!dto.aboutUs) {
+            throw new BadRequestException(
+                'About us is required',
+            );
+        }
+
+        if (!dto.city) {
+            throw new BadRequestException(
+                'City is required',
+            );
+        }
+
+        if (!dto.state) {
+            throw new BadRequestException(
+                'State is required',
+            );
+        }
+
+        if (!dto.country) {
+            throw new BadRequestException(
+                'Country is required',
+            );
+        }
+
+        if (!dto.postalCode) {
+            throw new BadRequestException(
+                'Postal code is required',
+            );
+        }
+
+        // Convert "08:00 AM" -> minutes
+        const convertToMinutes = (time: string): number => {
+            const [clock, period] = time.split(' ');
+            let [hour, minute] = clock.split(':').map(Number);
+
+            if (period === 'PM' && hour !== 12) hour += 12;
+            if (period === 'AM' && hour === 12) hour = 0;
+
+            return hour * 60 + minute;
+        };
+
+        const opening = convertToMinutes(dto.openingTime);
+        const closing = convertToMinutes(dto.closingTime);
+
+        if (opening >= closing) {
+            throw new BadRequestException(
+                'Opening time must be before closing time',
+            );
+        }
+
+        if (!dto.schedule || !Array.isArray(dto.schedule)) {
+            throw new BadRequestException(
+                'Schedule is required',
+            );
+        }
+
+        if (dto.schedule.length === 0) {
+            throw new BadRequestException(
+                'At least one day should be open',
+            );
+        }
+
+        for (const day of dto.schedule) {
+
+            for (const slot of day.slots) {
+
+                const start = convertToMinutes(slot.start);
+                const end = convertToMinutes(slot.end);
+
+                if (start < opening) {
+                    throw new BadRequestException(
+                        `${day.day}: Start time cannot be before salon opening time`,
+                    );
+                }
+
+                if (end > closing) {
+                    throw new BadRequestException(
+                        `${day.day}: End time cannot be after salon closing time`,
+                    );
+                }
+
+                if (start >= end) {
+                    throw new BadRequestException(
+                        `${day.day}: Start time must be before end time`,
+                    );
+                }
+            }
         }
 
         // CREATE SALON

@@ -8,23 +8,24 @@ import {
     Patch,
     Delete,
     Query,
-    Post
+    Post,
+    ParseUUIDPipe
 } from '@nestjs/common';
 
 import { BranchesService } from './branches.service';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { CreateBranchDto } from './dto/create-branch.dto';
 
-@Controller('branches')
+@Controller('salons/:salonId')
 export class BranchesController {
     constructor(
         private branchesService: BranchesService,
     ) { }
 
     @UseGuards(JwtAuthGuard)
-    @Post(':salonId')
+    @Post('branches')
     create(
-        @Param('salonId') salonId: string,
+        @Param('salonId', ParseUUIDPipe) salonId: string,
 
         @Body() dto: CreateBranchDto,
     ) {
@@ -35,7 +36,7 @@ export class BranchesController {
     }
 
     @UseGuards(JwtAuthGuard)
-    @Get(':salonId')
+    @Get('myBranches')
     findBySalon(
         @Param('salonId') salonId: string,
     ) {
@@ -45,9 +46,9 @@ export class BranchesController {
     }
 
     @UseGuards(JwtAuthGuard)
-    @Patch(':id')
+    @Patch('branch/:branchId')
     update(
-        @Param('id') id: string,
+        @Param('branchId') id: string,
         @Body() body,
         @Req() req,
     ) {
@@ -59,9 +60,9 @@ export class BranchesController {
     }
 
     @UseGuards(JwtAuthGuard)
-    @Delete(':id')
+    @Delete('branch/:branchId/remove')
     remove(
-        @Param('id') id: string,
+        @Param('branchId') id: string,
         @Req() req,
     ) {
         return this.branchesService.remove(
@@ -70,7 +71,7 @@ export class BranchesController {
         );
     }
 
-    @Get(':branchId/slots')
+    @Get('branch/:branchId/slots')
     getSlots(
         @Param('branchId')
         branchId: string,

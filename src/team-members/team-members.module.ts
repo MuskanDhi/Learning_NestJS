@@ -9,6 +9,7 @@ import { TeamMember } from './entities/team-member.entity';
 import { TeamMemberSchedule } from 'team-member-schedules';
 import { Appointment } from 'src/appointments/entities/appointment.entity';
 import { Cart } from 'src/add-services-into-cart/entities/add-services-into-cart.entity';
+import { TeamMemberAttendance } from 'src/team-member-attendence/entities/team-member-attendence.entity';
 
 @Module({
         imports: [
@@ -18,7 +19,8 @@ import { Cart } from 'src/add-services-into-cart/entities/add-services-into-cart
               TeamMember,
               TeamMemberSchedule,
               Appointment,
-              Cart
+              Cart,
+              TeamMemberAttendance
           ]),
           AuthModule
       ],

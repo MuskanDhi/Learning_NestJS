@@ -62,4 +62,27 @@ export class TeamMember {
     )
     schedules: TeamMemberSchedule[];
 
+    @Column({
+        length: 6,
+        nullable: true,
+    })
+    pin: string;
+
+    @Column({
+        default: false,
+    })
+    isCheckedIn: boolean;
+
+    @Column({
+        type: 'timestamp',
+        nullable: true,
+    })
+    checkInTime: Date;
+
+    @Column({
+        type: 'timestamp',
+        nullable: true,
+    })
+    checkOutTime: Date  | null;
+
 }

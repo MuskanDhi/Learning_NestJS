@@ -7,6 +7,7 @@ import {
     Param,
     Patch,
     Delete,
+    ParseUUIDPipe,
 } from '@nestjs/common';
 
 import { SalonsService } from './salons.service';
@@ -36,9 +37,9 @@ export class SalonsController {
     }
 
     @UseGuards(JwtAuthGuard)
-    @Get(':userId')
+    @Get('user/:userId/salons')
     findSalonsByUser(
-        @Param('userId') userId: string,
+        @Param('userId', ParseUUIDPipe) userId: string,
     ) {
         return this.salonsService.findMySalons(
             userId,
@@ -53,7 +54,7 @@ export class SalonsController {
     @UseGuards(JwtAuthGuard)
     @Patch(':id')
     update(
-        @Param('id') id: string,
+        @Param('id', ParseUUIDPipe) id: string,
         @Body() body,
         @Req() req,
     ) {
@@ -65,9 +66,9 @@ export class SalonsController {
     }
 
     @UseGuards(JwtAuthGuard)
-    @Delete(':id')
+    @Delete(':salonId')
     remove(
-        @Param('id') id: string,
+        @Param('salonId', ParseUUIDPipe) id: string,
         @Req() req,
     ) {
         return this.salonsService.remove(

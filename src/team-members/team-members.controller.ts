@@ -37,6 +37,30 @@ export class TeamMembersController {
     }
 
     @UseGuards(JwtAuthGuard)
+    @Post(':teamMemberId/branch/:branchId/check-in')
+    checkIn(
+        @Param('teamMemberId') teamMemberId: string,
+        @Param('branchId') branchId: string,
+    ) {
+        return this.teamMembersService.checkIn(
+            teamMemberId,
+            branchId,
+        );
+    }
+
+    @UseGuards(JwtAuthGuard)
+    @Post(':teamMemberId/branch/:branchId/check-out')
+    checkOut(
+        @Param('teamMemberId') teamMemberId: string,
+        @Param('branchId') branchId: string,
+    ) {
+        return this.teamMembersService.checkOut(
+            teamMemberId,
+            branchId,
+        );
+    }
+
+    @UseGuards(JwtAuthGuard)
     @Get(':branchId')
     findByBranch(
         @Param('branchId') branchId: string,
