@@ -18,7 +18,7 @@ import {
 import { JwtAuthGuard }
     from '../auth/jwt-auth.guard';
 import { CreateSalonDto } from './dto/create-salon.dto';
-@Controller('salons')
+@Controller()
 export class SalonsController {
     constructor(
         private salonsService: SalonsService,
@@ -37,7 +37,7 @@ export class SalonsController {
     }
 
     @UseGuards(JwtAuthGuard)
-    @Get('user/:userId/salons')
+    @Get('user/:userId/salons/my')
     findSalonsByUser(
         @Param('userId', ParseUUIDPipe) userId: string,
     ) {

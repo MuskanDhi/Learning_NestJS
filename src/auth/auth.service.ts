@@ -58,7 +58,14 @@ export class AuthService {
         return {
             success: true,
             message: 'OTP sent successfully',
-            otp: '123456',
+            // otp: '123456',
+            data: {
+                message: "OTP enqueued",
+                phoneNumber,
+                // ...(process.env.NODE_ENV !== "production" && {
+                //     otp: "123456",
+                // }),
+            },
         };
     }
 
@@ -343,65 +350,104 @@ export class AuthService {
                 },
             });
 
+        // if (!user) {
+
+        //     user =
+        //         this.userRepository.create({
+        //             phoneNumber,
+        //         });
+
+        //     await this.userRepository.save(
+        //         user,
+        //     );
+
+        //     return {
+        //         success: false,
+        //         message: 'Complete signup',
+        //         userId: user.id,
+        //     };
+        // }
+
         if (!user) {
 
-            user =
-                this.userRepository.create({
-                    phoneNumber,
-                });
+            user = this.userRepository.create({
+                phoneNumber,
+                active: true,
+            });
 
-            await this.userRepository.save(
-                user,
-            );
-
-            return {
-                success: false,
-                message: 'Complete signup',
-                userId: user.id,
-            };
+            user = await this.userRepository.save(user);
         }
 
         // ==========================
         // PROFILE INCOMPLETE
         // ==========================
-        if (
-            !user.firstName ||
-            !user.lastName ||
-            !user.email
-        ) {
-            return {
-                success: false,
-                message: 'Complete signup',
-                userId: user.id,
-            };
-        }
 
-        const token =
-            this.jwtService.sign({
-                id: user.id,
-            });
+        // if (
+        //     !user.firstName ||
+        //     !user.lastName ||
+        //     !user.email
+        // ) {
+        //     return {
+        //         success: false,
+        //         message: 'Complete signup',
+        //         userId: user.id,
+        //     };
+        // }
+
+        const isProfileComplete =
+            !!user.firstName &&
+            !!user.lastName &&
+            !!user.email;
+
+        const token = this.jwtService.sign({
+            sub: user.id,
+        });
 
         return {
             success: true,
-            message:
-                'OTP verified successfully',
-
-            access_token: token,
-
-            user: {
-                id: user.id,
-                firstName:
-                    user.firstName,
-                lastName:
-                    user.lastName,
-                email:
-                    user.email,
-                phoneNumber:
-                    user.phoneNumber,
-                salons:
-                    user.salons || [],
+            message: "OTP verified",
+            data: {
+                token,
+                user: {
+                    id: user.id,
+                    phoneNumber: user.phoneNumber,
+                    firstName: user.firstName,
+                    lastName: user.lastName,
+                    email: user.email,
+                    active: user.active,
+                    salons: user.salons || [],
+                },
+                isProfileComplete,
             },
         };
+
+        // const token =
+        //     this.jwtService.sign({
+        //         id: user.id,
+        //     });
+
+        // return {
+        //     success: true,
+        //     message:
+        //         'OTP verified successfully',
+
+        //     access_token: token,
+
+        //     user: {
+        //         id: user.id,
+        //         firstName:
+        //             user.firstName,
+        //         lastName:
+        //             user.lastName,
+        //         email:
+        //             user.email,
+        //         phoneNumber:
+        //             user.phoneNumber,
+        //         salons:
+        //             user.salons || [],
+        //     },
+        // };
+
     }
 
     // COMPLETE SIGNUP

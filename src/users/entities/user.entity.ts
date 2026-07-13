@@ -35,4 +35,9 @@ export class User {
 
   @OneToMany(() => Salon, (salon) => salon.user)
   salons: Salon[];
+
+  @Column({
+    default: true,
+  })
+  active: boolean;
 }
