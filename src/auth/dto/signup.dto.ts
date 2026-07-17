@@ -10,6 +10,8 @@ export class SignupDto {
     @IsNotEmpty()
     lastName: string;
 
-    @IsEmail()
+    @IsEmail({}, {
+        message: "Please enter a valid email address",
+    })
     email: string;
 }

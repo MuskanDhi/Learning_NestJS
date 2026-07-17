@@ -161,27 +161,9 @@ export class BranchesService {
             );
         }
 
-        if (!dto.city) {
-            throw new BadRequestException(
-                'City is required',
-            );
-        }
-
-        if (!dto.state) {
-            throw new BadRequestException(
-                'State is required',
-            );
-        }
-
         if (!dto.country) {
             throw new BadRequestException(
                 'Country is required',
-            );
-        }
-
-        if (!dto.postalCode) {
-            throw new BadRequestException(
-                'Postal code is required',
             );
         }
 

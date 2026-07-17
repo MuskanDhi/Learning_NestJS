@@ -25,11 +25,15 @@ export class SalonsController {
     ) { }
 
     @UseGuards(JwtAuthGuard)
-    @Post()
+    @Post('salons')
     create(
         @Body() dto: CreateSalonDto,
         @Req() req,
     ) {
+        console.log(dto);
+        console.log("req.user =", req.user);
+        console.log(req.user);
+        console.log("Passing:", req.user.id);
         return this.salonsService.create(
             dto,
             req.user.id,
@@ -52,9 +56,9 @@ export class SalonsController {
     }
 
     @UseGuards(JwtAuthGuard)
-    @Patch(':id')
+    @Patch('salons/:salonId')
     update(
-        @Param('id', ParseUUIDPipe) id: string,
+        @Param('salonId', ParseUUIDPipe) id: string,
         @Body() body,
         @Req() req,
     ) {
@@ -66,7 +70,7 @@ export class SalonsController {
     }
 
     @UseGuards(JwtAuthGuard)
-    @Delete(':salonId')
+    @Delete('salons/:salonId')
     remove(
         @Param('salonId', ParseUUIDPipe) id: string,
         @Req() req,

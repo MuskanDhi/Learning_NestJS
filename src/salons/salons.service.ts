@@ -37,7 +37,7 @@ export class SalonsService {
         dto: CreateSalonDto,
         userId: string,
     ) {
-
+        console.log("userId =", userId);
         // CHECK USER
 
         const user =
@@ -83,17 +83,6 @@ export class SalonsService {
             );
         }
 
-        if (!dto.city) {
-            throw new BadRequestException(
-                'City is required',
-            );
-        }
-
-        if (!dto.state) {
-            throw new BadRequestException(
-                'State is required',
-            );
-        }
 
         if (!dto.country) {
             throw new BadRequestException(
@@ -101,9 +90,26 @@ export class SalonsService {
             );
         }
 
-        if (!dto.postalCode) {
+
+        if (!/^[6-9]\d{9}$/.test(dto.phoneNumber)) {
             throw new BadRequestException(
-                'Postal code is required',
+                'Phone number must be a valid 10-digit Indian mobile number',
+            );
+        }
+
+        const isValidTime = (time: string): boolean => {
+            return /^(0[1-9]|1[0-2]):([0-5][0-9]) (AM|PM)$/.test(time);
+        };
+
+        if (!isValidTime(dto.openingTime)) {
+            throw new BadRequestException(
+                'Opening time must be in format HH:MM AM/PM',
+            );
+        }
+
+        if (!isValidTime(dto.closingTime)) {
+            throw new BadRequestException(
+                'Closing time must be in format HH:MM AM/PM',
             );
         }
 
@@ -143,6 +149,19 @@ export class SalonsService {
 
             for (const slot of day.slots) {
 
+                if (!isValidTime(slot.start)) {
+                    throw new BadRequestException(
+                        `${day.day}: Invalid start time format`,
+                    );
+                }
+
+                if (!isValidTime(slot.end)) {
+                    throw new BadRequestException(
+                        `${day.day}: Invalid end time format`,
+                    );
+                }
+
+
                 const start = convertToMinutes(slot.start);
                 const end = convertToMinutes(slot.end);
 
@@ -168,26 +187,38 @@ export class SalonsService {
 
         // CREATE SALON
 
-        const salon =
-            await this.salonRepository.save(
-                this.salonRepository.create({
-                    name: dto.name,
-                    user,
-                }),
-            );
+        console.log("Creating salon...");
 
-        // CREATE BRANCH
-
-        const branch =
-            await this.branchRepository.save(
-                this.branchRepository.create({
-                    ...dto,
-                    salon,
-                }),
-            );
-        this.notificationGateway.sendNotification(
-            'New booking received!',
+        const salon = await this.salonRepository.save(
+            this.salonRepository.create({
+                name: dto.name,
+                user,
+            }),
         );
+
+        console.log("Salon created", salon);
+
+        console.log("Creating branch...");
+
+        const branchEntity = this.branchRepository.create({
+            ...dto,
+            salon,
+        });
+
+        console.log(branchEntity);
+
+        const branch = await this.branchRepository.save(branchEntity);
+
+        console.log("Branch created", branch);
+
+        console.log("Sending notification");
+
+        this.notificationGateway.sendNotification(
+            "New booking received!",
+        );
+
+        console.log("Done");
+        
         return {
             message:
                 'Salon created successfully',
@@ -336,4 +367,3 @@ export class SalonsService {
     }
 
 }
-

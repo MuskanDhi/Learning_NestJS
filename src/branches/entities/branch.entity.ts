@@ -16,6 +16,7 @@ import { Deal } from 'src/deals/entities/deal.entity';
 import { InventoryItem } from 'src/inventory-items/entities/inventory-item.entity';
 import { PurchasedOrder } from 'src/purchased-order/entities/purchased-order.entity';
 import { Vendor } from 'src/vendors/entities/vendor.entity';
+import { IsOptional, IsString } from 'class-validator';
 
 
 @Entity('branches')
@@ -40,29 +41,16 @@ export class Branch {
 
     // ADDRESS FIELDS
 
-    @Column()
-    flatNo: string;
+    @IsOptional()
+    @IsString()
+    flatNo?: string;
 
-    @Column()
-    street: string;
-
-    @Column()
-    village: string;
-
-    @Column()
-    district: string;
-
-    @Column()
-    city: string;
-
-    @Column()
-    state: string;
+    @IsOptional()
+    @IsString()
+    street?: string;
 
     @Column()
     country: string;
-
-    @Column()
-    postalCode: string;
 
     // STORE SCHEDULE AS JSON
 
