@@ -16,14 +16,14 @@ import { BranchesService } from './branches.service';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { CreateBranchDto } from './dto/create-branch.dto';
 
-@Controller('salons/:salonId')
+@Controller()
 export class BranchesController {
     constructor(
         private branchesService: BranchesService,
     ) { }
 
     @UseGuards(JwtAuthGuard)
-    @Post('branches')
+    @Post('salons/:salonId/branches')
     create(
         @Param('salonId', ParseUUIDPipe) salonId: string,
 
@@ -46,7 +46,7 @@ export class BranchesController {
     }
 
     @UseGuards(JwtAuthGuard)
-    @Patch('branch/:branchId')
+    @Patch('branches/:branchId')
     update(
         @Param('branchId') id: string,
         @Body() body,
@@ -60,7 +60,7 @@ export class BranchesController {
     }
 
     @UseGuards(JwtAuthGuard)
-    @Delete('branch/:branchId/remove')
+    @Delete('branches/:branchId')
     remove(
         @Param('branchId') id: string,
         @Req() req,
