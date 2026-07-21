@@ -9,6 +9,7 @@ import {
 import { Category } from '../../categories/entities/category.entity';
 
 import { Service } from '../../services/entities/services.entity';
+import { Branch } from 'src/branches/entities/branch.entity';
 
 @Entity('sub_categories')
 export class SubCategory {
@@ -27,6 +28,15 @@ export class SubCategory {
         },
     )
     category: Category;
+
+    @ManyToOne(
+        () => Branch,
+        (branch) => branch.categories,
+        {
+            onDelete: 'CASCADE',
+        },
+    )
+    branch: Branch;
 
     @OneToMany(
         () => Service,

@@ -21,6 +21,12 @@ export class Category {
     })
     name: string;
 
+    @Column({
+        type: "text",
+        nullable: true,
+    })
+    description?: string;
+
     @OneToMany(
         () => SubCategory,
         (subCategory) => subCategory.category,

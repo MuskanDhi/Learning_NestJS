@@ -17,6 +17,7 @@ import { InventoryItem } from 'src/inventory-items/entities/inventory-item.entit
 import { PurchasedOrder } from 'src/purchased-order/entities/purchased-order.entity';
 import { Vendor } from 'src/vendors/entities/vendor.entity';
 import { IsOptional, IsString } from 'class-validator';
+import { SubCategory } from 'src/sub-categories/entities/sub-category.entity';
 
 
 @Entity('branches')
@@ -75,6 +76,12 @@ export class Branch {
         (category) => category.branch,
     )
     categories: Category[];
+
+    @OneToMany(
+        () => SubCategory,
+        (subcategory) => subcategory.branch,
+    )
+    subcategories: SubCategory[];
 
     @OneToMany(() => TeamMember, (team) => team.branch)
     teamMembers: TeamMember[];

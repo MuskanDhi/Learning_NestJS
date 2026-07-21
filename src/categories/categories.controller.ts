@@ -14,7 +14,7 @@ import { CategoriesService } from './categories.service';
 import { CreateCategoryDto } from './dto/create-category.dto';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 
-@Controller('branch/:branchId')
+@Controller()
 export class CategoriesController {
 
     constructor(
@@ -22,7 +22,7 @@ export class CategoriesController {
     ) { }
 
     @UseGuards(JwtAuthGuard)
-    @Post('category/add')
+    @Post('branch/:branchId/category/add')
     create(
         @Param('branchId') branchId: string,
         @Body() dto: CreateCategoryDto,
@@ -33,18 +33,18 @@ export class CategoriesController {
         );
     }
 
-    // @UseGuards(JwtAuthGuard)
-    // @Get('myCategories')
-    // findByBranch(
-    //     @Param('branchId') branchId: string,
-    // ) {
-    //     return this.categoriesService.findByBranch(
-    //         branchId,
-    //     );
-    // }
+    @UseGuards(JwtAuthGuard)
+    @Get('branch/:branchId/myCategories')
+    findByBranch(
+        @Param('branchId') branchId: string,
+    ) {
+        return this.categoriesService.findByBranch(
+            branchId,
+        );
+    }
 
     @UseGuards(JwtAuthGuard)
-    @Patch('category/:id')
+    @Patch('branch/:branchId/category/:id')
     update(
         @Param('id') id: string,
         @Body() body,
@@ -58,7 +58,7 @@ export class CategoriesController {
     }
 
     @UseGuards(JwtAuthGuard)
-    @Delete('category/:id/remove')
+    @Delete('branch/:branchId/category/:id')
     remove(
         @Param('id') id: string,
         @Req() req,

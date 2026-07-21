@@ -18,4 +18,20 @@ export class CreateServiceDto {
     @IsOptional()
     @IsString()
     description?: string;
+
+    @IsOptional()
+    @IsString()
+    Commission_type?: string;
+
+    @IsOptional()
+    @IsString()
+    amount?: string;
+
+    @IsOptional()
+    @IsString()
+    percentage?: string;
+
+    @IsOptional()
+    @IsString()
+    max_amount?: string;
 }

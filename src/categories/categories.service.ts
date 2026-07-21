@@ -95,41 +95,43 @@ export class CategoriesService {
         };
     }
 
-    // async findByBranch(
-    //     branchId: string,
-    // ) {
-    //     const branch =
-    //         await this.branchRepo.findOne({
-    //             where: {
-    //                 id: branchId,
-    //             },
-    //             relations: {
-    //                 salon: true,
-    //                 categories: {
-    //                     subCategories: {
-    //                         services: true,
-    //                     },
-    //                 },
-    //             },
-    //         });
+    //Get
 
-    //     if (!branch) {
-    //         throw new NotFoundException(
-    //             'Branch not found',
-    //         );
-    //     }
+    async findByBranch(
+        branchId: string,
+    ) {
+        const branch =
+            await this.branchRepo.findOne({
+                where: {
+                    id: branchId,
+                },
+                relations: {
+                    salon: true,
+                    categories: {
+                        subCategories: {
+                            services: true,
+                        },
+                    },
+                },
+            });
 
-    //     return {
-    //         salon: {
-    //             id: branch.salon.id,
-    //             name: branch.salon.name,
-    //             branches: {
-    //                 ...branch,
-    //                 salon: undefined,
-    //             },
-    //         },
-    //     };
-    // }
+        if (!branch) {
+            throw new NotFoundException(
+                'Branch not found',
+            );
+        }
+
+        return {
+            salon: {
+                id: branch.salon.id,
+                name: branch.salon.name,
+                branches: {
+                    ...branch,
+                    salon: undefined,
+                },
+            },
+        };
+    }
 
     // UPDATE CATEGORY
     async update(
