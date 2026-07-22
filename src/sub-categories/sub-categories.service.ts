@@ -224,29 +224,71 @@ export class SubCategoriesService {
         };
     }
 
+    // async remove(
+    //     subcategoryId: string,
+    //     userId: string,
+    // ) {
+    //     const subcategory =
+    //         await this.subcategoryRepo.findOne({
+    //             where: {
+    //                 id: subcategoryId,
+    //             },
+    //             relations: {
+    //                 category: {
+    //                     branch: {
+    //                         salon: {
+    //                             user: true,
+    //                         },
+    //                     },
+    //                 },
+    //             },
+    //         });
+
+    //     if (!subcategory) {
+    //         throw new NotFoundException(
+    //             'subcategory not found',
+    //         );
+    //     }
+
+    //     if (subcategory.category.branch.salon.user.id !== userId) {
+    //         throw new BadRequestException(
+    //             'This subcategory does not belong to you',
+    //         );
+    //     }
+
+    //     await this.subcategoryRepo.remove(
+    //         subcategory,
+    //     );
+
+    //     return {
+    //         message:
+    //             'SubCategory deleted successfully',
+    //     };
+    // }
+
     async remove(
         subcategoryId: string,
         userId: string,
     ) {
-        const subcategory =
-            await this.subcategoryRepo.findOne({
-                where: {
-                    id: subcategoryId,
-                },
-                relations: {
-                    category: {
-                        branch: {
-                            salon: {
-                                user: true,
-                            },
+        const subcategory = await this.subcategoryRepo.findOne({
+            where: {
+                id: subcategoryId,
+            },
+            relations: {
+                services: true,
+                category: {
+                    branch: {
+                        salon: {
+                            user: true,
                         },
                     },
                 },
-            });
+            },
+        });
 
         if (!subcategory) {
             throw new NotFoundException(
-                'subcategory not found',
+                'SubCategory not found',
             );
         }
 
@@ -256,13 +298,16 @@ export class SubCategoriesService {
             );
         }
 
-        await this.subcategoryRepo.remove(
-            subcategory,
-        );
+        if (subcategory.services.length > 0) {
+            throw new BadRequestException(
+                'Cannot delete subcategory because it contains services. Delete all services first.',
+            );
+        }
+
+        await this.subcategoryRepo.remove(subcategory);
 
         return {
-            message:
-                'SubCategory deleted successfully',
+            message: 'SubCategory deleted successfully',
         };
     }
 

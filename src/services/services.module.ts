@@ -9,16 +9,17 @@ import { TeamMember } from 'src/team-members/entities/team-member.entity';
 import { SubCategory } from 'src/sub-categories/entities/sub-category.entity';
 
 @Module({
-      imports: [
-        TypeOrmModule.forFeature([
-            Service,
-            Branch,
-            TeamMember,
-            SubCategory
-        ]),
-        AuthModule,
-    ],
+  imports: [
+    TypeOrmModule.forFeature([
+      Service,
+      Branch,
+      TeamMember,
+      SubCategory
+    ]),
+    AuthModule,
+  ],
   controllers: [ServicesController],
-  providers: [ServicesService]
+  providers: [ServicesService],
+  exports: [ServicesService]
 })
-export class ServicesModule {}
+export class ServicesModule { }

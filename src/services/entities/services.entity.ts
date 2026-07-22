@@ -14,6 +14,7 @@ import { Package } from '../../packages/entities/package.entity';
 import { Deal } from 'src/deals/entities/deal.entity';
 import { Branch } from 'src/branches/entities/branch.entity';
 import { Category } from 'src/categories/entities/category.entity';
+import { CommissionType } from './commission-type.enum';
 
 @Entity()
 export class Service {
@@ -31,14 +32,45 @@ export class Service {
     duration: string;
 
     @Column({ nullable: true })
-    description: string;
+    description?: string;
+
+    @Column({
+        type: "enum",
+        enum: CommissionType,
+        nullable: true,
+    })
+    commissionType?: CommissionType;
+
+    @Column({
+        type: "decimal",
+        precision: 10,
+        scale: 2,
+        nullable: true,
+    })
+    commissionAmount?: number | null;
+
+    @Column({
+        type: "decimal",
+        precision: 5,
+        scale: 2,
+        nullable: true,
+    })
+    commissionPercentage?: number | null;
+
+    @Column({
+        type: "decimal",
+        precision: 10,
+        scale: 2,
+        nullable: true,
+    })
+    maxCommissionAmount?: number | null;
 
     @ManyToOne(
         () => SubCategory,
         (subCategory) => subCategory.services,
-        {
-            onDelete: 'CASCADE',
-        },
+        // {
+        //     onDelete: 'CASCADE',
+        // },
     )
     subCategory: SubCategory;
 

@@ -182,23 +182,69 @@ export class CategoriesService {
         };
     }
 
+    // async remove(
+    //     categoryId: string,
+    //     userId: string,
+    // ) {
+    //     const category =
+    //         await this.categoryRepo.findOne({
+    //             where: {
+    //                 id: categoryId,
+    //             },
+    //             relations: {
+    //                 branch: {
+    //                     salon: {
+    //                         user: true,
+    //                     },
+    //                 },
+    //             },
+    //         });
+
+    //     if (!category) {
+    //         throw new NotFoundException(
+    //             'Category not found',
+    //         );
+    //     }
+
+    //     if (
+    //         category.branch.salon.user.id !==
+    //         userId
+    //     ) {
+    //         throw new BadRequestException(
+    //             'This category does not belong to you',
+    //         );
+    //     }
+
+    //     await this.categoryRepo.remove(
+    //         category,
+    //     );
+
+    //     return {
+    //         message:
+    //             'Category deleted successfully',
+    //     };
+
+    // }
+
     async remove(
         categoryId: string,
         userId: string,
     ) {
-        const category =
-            await this.categoryRepo.findOne({
-                where: {
-                    id: categoryId,
+        const category = await this.categoryRepo.findOne({
+            where: {
+                id: categoryId,
+            },
+            relations: {
+                subCategories: {
+                    services: true,
                 },
-                relations: {
-                    branch: {
-                        salon: {
-                            user: true,
-                        },
+                branch: {
+                    salon: {
+                        user: true,
                     },
                 },
-            });
+            },
+        });
 
         if (!category) {
             throw new NotFoundException(
@@ -215,9 +261,14 @@ export class CategoriesService {
             );
         }
 
-        await this.categoryRepo.remove(
-            category,
-        );
+        // Category has subcategories
+        if (category.subCategories.length > 0) {
+            throw new BadRequestException(
+                "This category can't be deleted because it contains active subcategories or services. Please delete the active subcategories/services first, then try again.",
+            );
+        }
+
+        await this.categoryRepo.remove(category);
 
         return {
             message:
