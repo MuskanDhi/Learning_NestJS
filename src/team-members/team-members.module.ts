@@ -10,6 +10,8 @@ import { TeamMemberSchedule } from 'team-member-schedules';
 import { Appointment } from 'src/appointments/entities/appointment.entity';
 import { Cart } from 'src/add-services-into-cart/entities/add-services-into-cart.entity';
 import { TeamMemberAttendance } from 'src/team-member-attendence/entities/team-member-attendence.entity';
+import { Role } from 'src/roles/entities/role.entity';
+import { Specialty } from 'src/specialties/entities/specialty.entity';
 
 @Module({
         imports: [
@@ -20,7 +22,9 @@ import { TeamMemberAttendance } from 'src/team-member-attendence/entities/team-m
               TeamMemberSchedule,
               Appointment,
               Cart,
-              TeamMemberAttendance
+              TeamMemberAttendance,
+              Role,
+              Specialty
           ]),
           AuthModule
       ],

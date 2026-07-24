@@ -2,6 +2,8 @@ import { Column, Entity, JoinTable, ManyToMany, ManyToOne, OneToMany, PrimaryGen
 import { Branch } from '../../branches/entities/branch.entity';
 import { Service } from '../../services/entities/services.entity';
 import { TeamMemberSchedule } from 'team-member-schedules';
+import { Role } from 'src/roles/entities/role.entity';
+import { Specialty } from 'src/specialties/entities/specialty.entity';
 @Entity('team_members')
 export class TeamMember {
 
@@ -31,6 +33,18 @@ export class TeamMember {
 
     @Column()
     gender: string;
+
+    @Column({ nullable: true })
+    profileImage: string;
+
+    @Column({ nullable: true })
+    experience: string;
+
+    @ManyToMany(() => Specialty, {
+        eager: true
+    })
+    @JoinTable()
+    specialties: Specialty[];
 
 
     @ManyToOne(
@@ -62,6 +76,15 @@ export class TeamMember {
     )
     schedules: TeamMemberSchedule[];
 
+    @ManyToOne(
+        () => Role,
+        (role) => role.teamMembers,
+        {
+            eager: true,
+        },
+    )
+    role: Role;
+
     @Column({
         length: 6,
         nullable: true,
@@ -83,6 +106,6 @@ export class TeamMember {
         type: 'timestamp',
         nullable: true,
     })
-    checkOutTime: Date  | null;
+    checkOutTime: Date | null;
 
 }

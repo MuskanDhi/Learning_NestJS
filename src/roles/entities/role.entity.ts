@@ -1,4 +1,5 @@
-import { Column, Entity, PrimaryGeneratedColumn } from "typeorm";
+import { TeamMember } from "src/team-members/entities/team-member.entity";
+import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 
 @Entity('roles')
 export class Role {
@@ -7,4 +8,10 @@ export class Role {
 
     @Column()
     label: string;
+
+    @OneToMany(
+        () => TeamMember,
+        (teamMember) => teamMember.role,
+    )
+    teamMembers: TeamMember[];
 }

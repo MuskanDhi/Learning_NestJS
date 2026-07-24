@@ -18,6 +18,8 @@ import { CreateTeamMemberDto } from './dto/create-team-member.dto';
 import { TeamMemberSchedule } from 'team-member-schedules';
 import { Appointment } from 'src/appointments/entities/appointment.entity';
 import { Cart } from 'src/add-services-into-cart/entities/add-services-into-cart.entity';
+import { Role } from 'src/roles/entities/role.entity';
+import { Specialty } from 'src/specialties/entities/specialty.entity';
 
 @Injectable()
 export class TeamMembersService {
@@ -42,12 +44,24 @@ export class TeamMembersService {
 
         @InjectRepository(Cart)
         private cartRepo: Repository<Cart>,
+
+        @InjectRepository(Role)
+        private readonly roleRepo: Repository<Role>,
+
+        @InjectRepository(Specialty)
+        private readonly specialtyRepo: Repository<Specialty>,
     ) { }
 
     async create(
         branchId: string,
         dto: CreateTeamMemberDto,
     ) {
+
+        const specialties = await this.specialtyRepo.find({
+            where: {
+                id: In(dto.specialtyIds || []),
+            },
+        });
 
         const branch =
             await this.branchRepo.findOne({
@@ -163,11 +177,53 @@ export class TeamMembersService {
             }
         }
 
+        // const teamMember = await this.teamMemberRepo.save(
+        //     this.teamMemberRepo.create({
+        //         ...dto,
+        //         branch,
+        //         services,
+        //     }),
+        // );
+
+        // const role = await this.roleRepo.findOne({
+        //     where: {
+        //         id: dto.roleId,
+        //     },
+        // });
+
+        const role = await this.roleRepo.findOne({
+            where: {
+                id: Number(dto.roleId),
+            },
+        });
+
+        if (!role) {
+            throw new NotFoundException("Role not found");
+        }
         const teamMember = await this.teamMemberRepo.save(
             this.teamMemberRepo.create({
-                ...dto,
+                firstName: dto.firstName,
+                lastName: dto.lastName,
+                email: dto.email,
+                phoneNumber: dto.phoneNumber,
+                address: dto.address,
+                joiningDate: dto.joiningDate,
+
+                experience: dto.experience,
+
+                profileImage: dto.profileImage,
+
+                aboutMember: dto.aboutMember,
+
+                gender: dto.gender,
+
                 branch,
+
+                role,
+
                 services,
+
+                specialties,
             }),
         );
 

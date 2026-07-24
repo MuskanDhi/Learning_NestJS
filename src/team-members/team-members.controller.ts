@@ -17,7 +17,7 @@ import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 
 import { CreateTeamMemberDto } from './dto/create-team-member.dto';
 
-@Controller('team-members')
+@Controller()
 export class TeamMembersController {
 
     constructor(
@@ -25,7 +25,7 @@ export class TeamMembersController {
     ) { }
 
     @UseGuards(JwtAuthGuard)
-    @Post(':branchId')
+    @Post('branches/:branchId/team-members')
     create(
         @Param('branchId') branchId: string,
         @Body() dto: CreateTeamMemberDto,
@@ -61,7 +61,7 @@ export class TeamMembersController {
     }
 
     @UseGuards(JwtAuthGuard)
-    @Get(':branchId')
+    @Get('branches/:branchId/team-members')
     findByBranch(
         @Param('branchId') branchId: string,
     ) {
