@@ -11,13 +11,13 @@ export class Package {
     packageName: string;
 
     @Column()
-    originalPrice: string;
+    originalPrice: number;
 
     @Column()
-    offeredPrice: string;
+    offeredPrice: number;   
 
     @Column()
-    duration: string;
+    duration: number;
 
     @Column({
         generated: 'increment',
@@ -28,7 +28,8 @@ export class Package {
     @Column({
         type: 'enum',
         enum: ['day', 'month', 'year'],
-    })
+    },
+    )
     unit: string;
 
     @ManyToOne(

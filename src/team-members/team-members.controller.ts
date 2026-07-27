@@ -71,7 +71,7 @@ export class TeamMembersController {
     }
 
     @UseGuards(JwtAuthGuard)
-    @Patch(':id')
+    @Patch('branches/:branchId/team-members/:id')
     update(
         @Param('id') id: string,
         @Body() body,
@@ -85,7 +85,7 @@ export class TeamMembersController {
     }
 
     @UseGuards(JwtAuthGuard)
-    @Delete(':id')
+    @Delete('branches/:branchId/team-members/:id')
     remove(
         @Param('id') id: string,
         @Req() req,

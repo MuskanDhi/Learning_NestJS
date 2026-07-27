@@ -88,8 +88,9 @@ export class PackagesService {
                     packageName:
                         dto.packageName,
 
-                    originalPrice:
-                        originalPrice.toString(),
+                    // originalPrice:
+                    //     originalPrice.toString(),
+                    originalPrice,
 
                     offeredPrice:
                         dto.offeredPrice,

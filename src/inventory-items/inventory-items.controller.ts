@@ -1,13 +1,15 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from '@nestjs/common';
 import { InventoryItemsService } from './inventory-items.service';
 import { CreateInventoryItemDto } from './dto/create-inventory-item.dto';
+import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 
-@Controller('branches/:branchId/inventory-items')
+@Controller('branches/:branchId/inventoryItems')
 export class InventoryItemsController {
   constructor(
     private readonly inventoryService: InventoryItemsService,
-  ) {}
+  ) { }
 
+  @UseGuards(JwtAuthGuard)
   @Post()
   create(
     @Param('branchId') branchId: string,
@@ -19,6 +21,7 @@ export class InventoryItemsController {
     );
   }
 
+  @UseGuards(JwtAuthGuard)
   @Get()
   findAll(
     @Param('branchId') branchId: string,
@@ -28,21 +31,23 @@ export class InventoryItemsController {
     );
   }
 
-  @Patch(':id')
+  @UseGuards(JwtAuthGuard)
+  @Patch(':inventoryItemId')
   update(
-    @Param('id') id: string,
+    @Param('inventoryItemId') inventoryItemId: string,
     @Body() dto: Partial<CreateInventoryItemDto>,
   ) {
     return this.inventoryService.update(
-      id,
+      inventoryItemId,
       dto,
     );
   }
 
-  @Delete(':id')
+  @UseGuards(JwtAuthGuard)
+  @Delete(':inventoryItemId')
   remove(
-    @Param('id') id: string,
+    @Param('inventoryItemId') inventoryItemId: string,
   ) {
-    return this.inventoryService.remove(id);
+    return this.inventoryService.remove(inventoryItemId);
   }
 }

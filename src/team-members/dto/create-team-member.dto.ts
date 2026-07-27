@@ -4,7 +4,7 @@
 //     IsOptional,
 // } from 'class-validator';
 
-import { IsEmail, IsNotEmpty, IsOptional } from "class-validator";
+import { IsArray, IsEmail, IsNotEmpty, IsOptional } from "class-validator";
 
 // export class CreateTeamMemberDto {
 
@@ -99,6 +99,7 @@ export class CreateTeamMemberDto {
     @IsOptional()
     specialtyIds: number[];
 
+    @IsArray()
     workingSchedule: {
         day: string;
         isOff: boolean;

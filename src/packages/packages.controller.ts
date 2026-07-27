@@ -3,7 +3,7 @@ import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 import { PackagesService } from './packages.service';
 import { CreatePackageDto } from './dto/create-package.dto';
 
-@Controller('packages')
+@Controller()
 export class PackagesController {
 
     constructor(
@@ -11,7 +11,7 @@ export class PackagesController {
     ){ }
 
     @UseGuards(JwtAuthGuard)
-    @Post(':branchId')
+    @Post('branches/:branchId/offers')
     create(
         @Param('branchId') branchId: string,
         @Body() dto: CreatePackageDto,
@@ -23,7 +23,7 @@ export class PackagesController {
     }
 
     @UseGuards(JwtAuthGuard)
-    @Get(':branchId')
+    @Get('branches/:branchId/offers')
     findByBranch(
         @Param('branchId') branchId: string,
     ){
@@ -33,7 +33,7 @@ export class PackagesController {
     }
 
     @UseGuards(JwtAuthGuard)
-    @Patch(':id')
+    @Patch('branches/:branchId/offers/:id/override')
     update(
         @Param('id') id: string,
         @Body() body,
@@ -47,7 +47,7 @@ export class PackagesController {
     }
 
     @UseGuards(JwtAuthGuard)
-    @Delete(':id')
+    @Delete('branches/:branchId/offers/packages/:id')
     remove(
         @Param('id') id: string,
         @Req() req,

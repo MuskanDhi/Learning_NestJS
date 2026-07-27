@@ -5,6 +5,9 @@ export class CreateDealDto {
     dealName: string;
 
     @IsNotEmpty()
+    originalPrice: string;
+
+    @IsNotEmpty()
     offeredPrice: string;
 
     @IsNotEmpty()

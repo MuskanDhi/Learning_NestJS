@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Vendor } from './entities/vendor.entity';
 import { Repository } from 'typeorm';
@@ -82,5 +82,90 @@ export class VendorsService {
         branch: true,
       },
     });
+  }
+
+  async update(
+    vendorId: string,
+    body,
+    userId: string,
+  ) {
+    const vendors =
+      await this.vendorRepo.findOne({
+        where: {
+          id: vendorId,
+        },
+        relations: {
+          branch: {
+            salon: {
+              user: true,
+            },
+          },
+        },
+      });
+
+    if (!vendors) {
+      throw new NotFoundException(
+        'Vendor not found',
+      );
+    }
+
+    // if(vendors.branch.salon.user.id !== userId){
+    //   throw new BadRequestException(
+    //     'This vendor does not belongs to you',
+    //   );
+    // }
+
+    Object.assign(vendors, body);
+
+    const updatedVendor =
+      await this.vendorRepo.save(
+        vendors,
+      );
+
+    return {
+      message:
+        'Vendor updated successfully',
+      vendor: updatedVendor,
+    };
+  }
+
+  async remove(
+    vendorId: string,
+    userId: string,
+  ) {
+    const vendors =
+      await this.vendorRepo.findOne({
+        where: {
+          id: vendorId,
+        },
+        relations: {
+          branch: {
+            salon: {
+              user: true,
+            },
+          },
+        },
+      });
+
+    if (!vendors) {
+      throw new NotFoundException(
+        'Vendor not found',
+      );
+    }
+
+    // if (vendors.branch.salon.user.id !== userId) {
+    //   throw new BadRequestException(
+    //     'This vendor does not belong to you',
+    //   );
+    // }
+
+    await this.vendorRepo.remove(
+      vendors,
+    );
+
+    return {
+      message:
+        'Vendor deleted successfully',
+    };
   }
 }

@@ -1,6 +1,7 @@
 import {
     IsArray,
     IsNotEmpty,
+    IsOptional,
 } from 'class-validator';
 
 export class CreatePackageDto {
@@ -9,10 +10,13 @@ export class CreatePackageDto {
     packageName: string;
 
     @IsNotEmpty()
-    offeredPrice: string;
+    originalPrice: number;
 
     @IsNotEmpty()
-    duration: string;
+    offeredPrice: number;
+
+    @IsNotEmpty()
+    duration: number;
 
     @IsNotEmpty()
     unit: string;

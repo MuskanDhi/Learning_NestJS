@@ -92,35 +92,90 @@ export class PurchasedOrderService {
     };
   }
 
-  async findOne(
-    branchId: string,
-    purchasedOrderId: string,
-  ) {
-    const purchasedOrder =
-      await this.purchasedOrderRepo.findOne({
-        where: {
-          id: purchasedOrderId,
-          branch: {
-            id: branchId,
-          },
-        },
-        relations: {
-          item: true,
-          branch: true,
-        },
-      });
+  // async findOne(
+  //   branchId: string,
+  //   purchasedOrderId: string,
+  // ) {
+  //   const purchasedOrder =
+  //     await this.purchasedOrderRepo.findOne({
+  //       where: {
+  //         id: purchasedOrderId,
+  //         branch: {
+  //           id: branchId,
+  //         },
+  //       },
+  //       relations: {
+  //         item: true,
+  //         branch: true,
+  //       },
+  //     });
 
-    if (!purchasedOrder) {
-      throw new NotFoundException(
-        'Purchased order not found',
-      );
-    }
+  //   if (!purchasedOrder) {
+  //     throw new NotFoundException(
+  //       'Purchased order not found',
+  //     );
+  //   }
 
-    return {
-      id: purchasedOrder.id,
-      itemName: purchasedOrder.item.itemName,
-      orderedQuantity:
-        purchasedOrder.orderedQuantity,
-    };
+  //   return {
+  //     id: purchasedOrder.id,
+  //     itemName: purchasedOrder.item.itemName,
+  //     orderedQuantity:
+  //       purchasedOrder.orderedQuantity,
+  //   };
+  // }
+
+  async findAll(branchId: string) {
+    return this.purchasedOrderRepo.find({
+      where: {
+        branch: {
+          id: branchId,
+        },
+      },
+      relations: {
+        branch: true,
+      },
+    });
   }
+
+  // async update(
+  //   id: string,
+  //   dto: Partial<CreatePurchasedOrderDto>,
+  // ){
+  //   const item =
+  //   await this.purchasedOrderRepo.findOne({
+  //     where: { id },
+  //   });
+
+  //   if(!item) {
+  //     throw new NotFoundException(
+  //       'Purchased Order not found',
+  //     );
+  //   }
+
+  //   Object.assign(item, dto);
+
+  //   return this.purchasedOrderRepo.save(item);
+  // }
+
+  // async remove(
+  //   id: string,
+  // ){
+  //   const item =
+  //     await this.purchasedOrderRepo.findOne({
+  //       where: { id },
+  //     });
+
+  //     if(!item) {
+  //       throw new NotFoundException(
+  //         'Purchased Order not found',
+  //       );
+  //     }
+
+  //     await this.purchasedOrderRepo.remove(item);
+
+  //     return {
+  //       message:
+  //       'Purchased Order deleted successfully',
+  //     };
+  // }
 }

@@ -52,6 +52,19 @@ export class TeamMembersService {
         private readonly specialtyRepo: Repository<Specialty>,
     ) { }
 
+    private formatTimeTo12Hour(time: string): string {
+        const [hour, minute] = time.split(":").map(Number);
+
+        const date = new Date();
+        date.setHours(hour, minute);
+
+        return date.toLocaleTimeString("en-US", {
+            hour: "2-digit",
+            minute: "2-digit",
+            hour12: true,
+        });
+    }
+
     async create(
         branchId: string,
         dto: CreateTeamMemberDto,
@@ -292,15 +305,87 @@ export class TeamMembersService {
                 },
                 relations: {
                     services: true,
+                    schedules: true,
+                    role: true,
+                    specialties: true,
+                    branch: true,
                 },
             });
+
+        // return {
+        //     branch: {
+        //         ...branch,
+        //         teamMembers: teamMembers.map(
+        //             ({ branch, ...member }) => member,
+        //         ),
+        //     },
+        // };
 
         return {
             branch: {
                 ...branch,
-                teamMembers: teamMembers.map(
-                    ({ branch, ...member }) => member,
-                ),
+                teamMembers: teamMembers.map((member) => {
+                    const schedule = member.schedules.reduce(
+                        (acc, item) => {
+                            let day = acc.find(
+                                (d) =>
+                                    d.day === item.day.toLowerCase(),
+                            );
+
+                            if (!day) {
+                                day = {
+                                    day: item.day.toLowerCase(),
+                                    slots: [],
+                                };
+
+                                acc.push(day);
+                            }
+
+                            if (!item.isOff) {
+                                day.slots.push({
+                                    start: this.formatTimeTo12Hour(item.startTime),
+                                    end: this.formatTimeTo12Hour(item.endTime),
+                                });
+                            }
+
+                            return acc;
+                        },
+                        [] as {
+                            day: string;
+                            slots: {
+                                start: string;
+                                end: string;
+                            }[];
+                        }[],
+                    );
+
+                    return {
+                        id: member.id,
+                        firstName: member.firstName,
+                        lastName: member.lastName,
+                        email: member.email,
+                        phoneNumber: member.phoneNumber,
+                        address: member.address,
+                        joiningDate: member.joiningDate,
+                        experience: member.experience,
+                        aboutMember: member.aboutMember,
+                        gender: member.gender,
+                        profileImage: member.profileImage,
+
+                        role: member.role,
+
+                        services: member.services,
+
+                        specialties: member.specialties,
+
+                        schedule,
+
+                        branch: {
+                            id: member.branch.id,
+                            name: member.branch.name,
+                        },
+                    };
+                }),
             },
         };
     }
@@ -331,11 +416,11 @@ export class TeamMembersService {
             );
         }
 
-        if (teams.branch.salon.user.id !== userId) {
-            throw new BadRequestException(
-                "This Team Member not belong to you",
-            );
-        }
+        // if (teams.branch.salon.user.id !== userId) {
+        //     throw new BadRequestException(
+        //         "This Team Member not belong to you",
+        //     );
+        // }
 
         if (body.serviceIds) {
             const services = await this.serviceRepo.find({
